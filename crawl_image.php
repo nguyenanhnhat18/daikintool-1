@@ -4,13 +4,47 @@
     ini_set('memory_limit', '-1');
 
 	$tmpfsuitename = dirname(__FILE__).'/cookiesrealestate.txt';
-	$address = "21 Canberra Rd, Toorak, VIC 3142";
-	//$address = $_REQUEST['full_address'];
-	$address = strtolower(str_replace(" ","-",str_replace(",","",$address)));
+	$address = "21 Canberra Rd Toorak VIC 3142";
+	
+	$invoiceID = $_REQUEST['record_id'];
+	// $street = $_REQUEST['street'];
+	// $city = $_REQUEST['city'];
+	// $state = $_REQUEST['state'];
+	// $postcode = $_REQUEST['postcode'];
+	// $address = $street.' '.$city.' '.$state.' '.$postcode;
+
+	//VUT-Send address to realstate > get 'url' and 'id' suggest[0] 
+	$url = 'https://suggest.realestate.com.au/consumer-suggest/suggestions?max=1&query='.str_replace(" ","%20",$address).'&type=address&src=homepage';
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+	curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
+	$headers = array();
+	$headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0';
+	$headers[] = 'Accept: */*';
+	$headers[] = 'Accept-Language: en-GB,en;q=0.5';
+	$headers[] = 'Origin: https://www.realestate.com.au';
+	$headers[] = 'Connection: keep-alive';
+	$headers[] = 'Referer: https://www.realestate.com.au/property/';
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+	$result = curl_exec($ch);
+	curl_close($ch);
+
+	$suggestAddress = json_decode($result);
+	//$address = $suggestAddress->_embedded->suggestions[0]->display->text;
+	// $address = strtolower(str_replace(" ","-",str_replace(",","",$address)));
+	// $idAddress = $suggestAddress->_embedded->suggestions[0]->id;
+	$urlAddress = $suggestAddress->_embedded->suggestions[0]->source->url;
+	// $url = 'https://www.realestate.com.au/property/'.$address.'?source=property-search-p4ep';
+	$url = $urlAddress;
+
+	//$address = strtolower(str_replace(" ","-",str_replace(",","",$address)));
 	
 	$ch = curl_init();
-
-	curl_setopt($ch, CURLOPT_URL, 'https://www.realestate.com.au/property/'.$address.'?source=property-search-p4ep');
+	//curl_setopt($ch, CURLOPT_URL, 'https://www.realestate.com.au/property/'.$address.'?source=property-search-p4ep');
+	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 	//curl_setopt($ch, CURLOPT_COOKIEJAR, $tmpfsuitename);
@@ -42,15 +76,15 @@
 	if(count($output_array) > 1){
 		$json_return = json_decode($output_array[1]);
 		$i = 0;
-		mkdir($address);
+		if(!is_dir($invoiceID)){
+			mkdir($invoiceID);
+		}
 		foreach($json_return as $img){
 			$images_arr[$i] = $img->server.'/600x800-resize,extend,r=33,g=40,b=46'.$img->uri;
 			$a = explode("/",$img->uri);
 			
-			$a = copy($images_arr[$i], dirname(__FILE__).'/'.$address.'/'.$a[2]);
+			$a = copy($images_arr[$i], dirname(__FILE__).'/'.$invoiceID.'/'.$a[2]);
 			$i++;
 		}
-		
-		print_r($images_arr);die;
 	}
 ?>
