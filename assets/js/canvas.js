@@ -139,3 +139,49 @@ function openNav() {
 function closeNav() {
   document.getElementById("mySidenav").style.width = "0";
 }
+
+//VUT-
+  /**SAVE image */
+function saveImage() {
+  var photo = canvas.toDataURL();
+  var searchParams = new URLSearchParams(window.location.search);
+  if (searchParams.has('record_id')) { 
+    var record_id = searchParams.get('record_id');  
+    $.ajax({
+      method: "POST",
+      url: 'saveFile.php',
+      data: {
+        photo : photo,
+        record_id : record_id
+      }
+    }).done(function (o){
+      alert('Image have saved into Server!');
+    });
+  }
+}
+
+function loadImage() {
+  var searchParams = new URLSearchParams(window.location.search);
+  if (searchParams.has('record_id')) {
+    var record_id = searchParams.get('record_id');  
+    $.ajax({
+      method: "POST",
+      url: 'loadFile.php',
+      data: {
+        record_id: record_id
+      },
+      success: function(data) {
+        if (!data) return;
+        var json = $.parseJSON(data);
+        $('#mySidenav').remove();
+        var mysidenav = '<div id="mySidenav" class="sidenav">'+
+                        '</div>';
+        $('#ImagesLayOut').after(mysidenav);
+        for (var i=0; i < json.length ; i++) {
+          $('#mySidenav').append('<img src="'+json[i]+'" style="height: 100px;" onclick="chooseCrawlImages(this)"></img>');
+        }
+        debugger;
+      }
+    });  
+  }
+}

@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CANVAS</title>
     <link rel="stylesheet" type="text/css" href="assets/css/canvas.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
+    <script src="assets/js/mootools-yui-compressed.js"></script>
 </head>
 <body>
     <p>Drag images from blue toolbar onto red canvas</p>
@@ -22,15 +25,6 @@
     </div>
 
     <div id="mySidenav" class="sidenav">
-        <!-- <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a> -->
-        <img src="21-canberra-rd-toorak-vic-3142\floorplan1.jpg" style="height: 100px;" onclick="chooseCrawlImages(this)">
-        <img src="21-canberra-rd-toorak-vic-3142\image2.jpg" style="height: 100px;" onclick="chooseCrawlImages(this)">
-        <img src="21-canberra-rd-toorak-vic-3142\image3.jpg" style="height: 100px;" onclick="chooseCrawlImages(this)">
-        <img src="21-canberra-rd-toorak-vic-3142\image4.jpg" style="height: 100px;" onclick="chooseCrawlImages(this)">
-        <img src="21-canberra-rd-toorak-vic-3142\image5.jpg" style="height: 100px;" onclick="chooseCrawlImages(this)">
-        <!-- <img src="21-canberra-rd-toorak-vic-3142\image6.jpg" style="height: 100px;" onclick="chooseCrawlImages(this)">
-        <img src="21-canberra-rd-toorak-vic-3142\image7.jpg" style="height: 100px;" onclick="chooseCrawlImages(this)"> -->
-        <img src="21-canberra-rd-toorak-vic-3142\main.jpg" style="height: 100px;" onclick="chooseCrawlImages(this)">
     </div>
 
     <div id="BtnGroup">
@@ -41,6 +35,9 @@
             <!-- <img class="layout" src="#" alt="your image" /> -->
         </form>
         <a id="download" download="download.png"><button type="button" onclick="convertCanvasToImage()" >Download</button></a>
+        <button type="button" onclick="saveImage()">Save</button>
+        <button type="button" onclick="loadImage()">Load Images</button>
+
     </div>
 
 	<script src="assets/js/canvas.js"></script>
