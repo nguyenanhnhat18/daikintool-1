@@ -141,7 +141,7 @@ function closeNav() {
 }
 
 //VUT-
-  /**SAVE image */
+  /**SAVE Image */
 function saveImage() {
   var photo = canvas.toDataURL();
   var searchParams = new URLSearchParams(window.location.search);
@@ -159,7 +159,7 @@ function saveImage() {
     });
   }
 }
-
+  /**LOAD Image */
 function loadImage() {
   var searchParams = new URLSearchParams(window.location.search);
   if (searchParams.has('record_id')) {
@@ -180,8 +180,11 @@ function loadImage() {
         for (var i=0; i < json.length ; i++) {
           $('#mySidenav').append('<img src="'+json[i]+'" style="height: 100px;" onclick="chooseCrawlImages(this)"></img>');
         }
-        debugger;
       }
     });  
   }
 }
+
+$(document).ready(function(){
+  loadImage();
+});

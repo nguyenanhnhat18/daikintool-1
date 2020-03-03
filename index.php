@@ -30,7 +30,7 @@
     <div id="BtnGroup">
         <!-- <span style="cursor:pointer;" onclick="openNav()">&#9776; Crawled Images</span> -->
         <form runat="server" >
-            <input type='file' id="imgInp" />
+            <input type='file' id="imgInp" accept="image/jpeg, image/png, image/jpg"/>
             <img id="layout" class="layout" src="images/Draft_layout_daikin_US7_x6.png" style="display: none">
             <!-- <img class="layout" src="#" alt="your image" /> -->
         </form>
