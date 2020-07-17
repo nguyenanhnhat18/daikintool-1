@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- <link rel="icon" type="image/png" href="images/icons/favicon.ico" /> -->
+    <link rel="icon" type="image/png" href="icon/logo_pure_icon.png" />
 
     <link rel="stylesheet" type="text/css" href="css/util.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -15,6 +15,8 @@
 
 <body>
     <div class="wrapper">
+        <input type="hidden" id="quote_id" value="">
+        <input type="hidden" id="pre_install_photos_c" value="">
         <div class="b-page__header">
             <header class="b-header">
                 <div class="b-header__left">
@@ -37,9 +39,9 @@
                                 <img src="icon/logoPure.png" height="100%" alt=""><span style="margin-left: 10px">Pure
                                     Electric</span>
                             </div>
-                            <div class="b-switch__item js-switch-item" mode="view3d">
+                            <!-- <div class="b-switch__item js-switch-item" mode="view3d">
                                 <img src="icon/Daikin_logo_white_background.png" height="100%" alt="">
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -90,7 +92,7 @@
                     </span>
                 </div>
             </div>
-            <div id="daikin-option" class="pane-affix pane-affix--catalog js-pane-affix is-active" data-target="daikin">
+            <div id="daikin-option" class="pane-affix pane-affix--catalog js-pane-affix" data-target="daikin">
                 <div class="pane-affix__container">
                     <div class="pane-affix__header">
                         <div class="pane-affix__header-title js-pane-affix-link" data-href="construction">
@@ -101,23 +103,8 @@
                         </div>
                     </div>
                     <div class="pane-affix__content pane-affix__content--type-catalog">
-                        <div class="pane-affix__catalog" id="roomsItems">
-                            <div class="pane-affix__catalog-column is-2">
-                                <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">
-                                    <div class="item-texture__image">
-                                        <img src="icon/daikin-us7.jpg" alt="">
-                                    </div>
-                                </a>
-                                <span><strong>Daikin US7 (2X)</strong></span>
-                            </div>
-                            <div class="pane-affix__catalog-column is-2">
-                                <a class="pane-affix__catalog-item item-texture is-shrink" data-link="room1">
-                                    <div class="item-texture__image">
-                                        <img src="icon/daikin-us7.jpg" alt="">
-                                    </div>
-                                </a>
-                                <span><strong>Daikin Nexura (2X)</strong></span>
-                            </div>
+                        <div class="pane-affix__catalog" id="daikinItems">
+                            <!-- Add Daikin Devices Here -->
                         </div>
                     </div>
                 </div>
@@ -133,28 +120,25 @@
                         </div>
                     </div>
                     <div class="pane-affix__content pane-affix__content--type-catalog">
-                        <div class="pane-affix__catalog" id="roomsItems">
-                            <div class="pane-affix__catalog-column is-2">
-                                <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">
-                                    <div class="item-texture__image">
-                                        <img src="icon/daikin-us7.jpg" alt="">
-                                    </div>
-                                </a>
-                                <span><strong>Daikin US7 (2X)</strong></span>
-                            </div>
-                            <div class="pane-affix__catalog-column is-2">
-                                <a class="pane-affix__catalog-item item-texture is-shrink" data-link="room1">
-                                    <div class="item-texture__image">
-                                        <img src="icon/daikin-us7.jpg" alt="">
-                                    </div>
-                                </a>
-                                <span><strong>Daikin Nexura (2X)</strong></span>
-                            </div>
+                        <div class="pane-affix__catalog" id="FloorItems">
+                            <!-- Add Plan Floor -->
                         </div>
+                    </div>
+                    <div class="pane-floor_upload-file">
+                        <form id="uploadFloor" action method="POST" enctype="multipart/form-data">
+                            <div class="upload-btn-wrapper">
+                                <button class="btn">Upload</button>
+                                <input type="file" id="area-upload" name="floor_image[]" accept="image/*" multiple />
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    <div class="loading">
+        <img src="icon/loading.svg" alt="">
+        <h3>Preparing Daikin Option</h3>
     </div>
     <script
         src="https://code.jquery.com/jquery-3.5.1.js"
