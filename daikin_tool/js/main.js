@@ -97,21 +97,27 @@
             type: 'POST',
             success: function(data)
             {
-                var res = jQuery.parseJSON(data);
-                for(var i = 0; i < res.length; i++) {
-                    var wrapperItemFloor = $('#FloorItems');
-                    var itemFloor = '<div class="pane-affix__catalog-column is-2">\
-                                        <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
-                                            <div class="item-texture__image">\
-                                                <img src="'+res[i]+'" alt="">\
-                                            </div>\
-                                        </a>\
-                                    </div>';
-                                    wrapperItemFloor.append(itemFloor);
-                    // console.log(res['products'][keys[i]]);
+                if(data != 'fail') {
+                    var res = jQuery.parseJSON(data);
+                    for(var i = 0; i < res.length; i++) {
+                        var wrapperItemFloor = $('#FloorItems');
+                        var itemFloor = '<div class="pane-affix__catalog-column is-2">\
+                                            <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
+                                                <div class="item-texture__image">\
+                                                    <img src="'+res[i]+'" alt="">\
+                                                </div>\
+                                            </a>\
+                                        </div>';
+                                        wrapperItemFloor.append(itemFloor);
+                        $('.loading').hide();
+                        $('#editor, #editorControls').removeClass('hidden-opacity');
+                    }
+                } else {
+                    alert("Can't get photo of Floor Plan, Please upload photo by your device");
                     $('.loading').hide();
                     $('#editor, #editorControls').removeClass('hidden-opacity');
                 }
+                
                 
             },
             error: function(response){console.log("Fail");},
