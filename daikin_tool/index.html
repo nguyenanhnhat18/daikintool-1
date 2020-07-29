@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- <link rel="icon" type="image/png" href="images/icons/favicon.ico" /> -->
-
+    
     <link rel="stylesheet" type="text/css" href="css/util.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    
     
 </head>
 
@@ -17,13 +18,13 @@
         <div class="b-page__header">
             <header class="b-header">
                 <div class="b-header__left">
-                    <div class="b-header__item b-header__undo" id="" mode="undo"   data-modes="editor noauth">
+                    <div class="b-header__item b-header__undo" id="" title="UNDO" mode="undo" onclick="undo()"  data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
                             <img src="icon/undo.png" height="100%" alt="">
                         </span>
                     </div>
-                    <div class="b-header__item b-header__redo is-disabled" mode="redo"  
-                        data-modes="editor noauth">
+                    <!-- is-disabled -->
+                    <div class="b-header__item b-header__redo" id="" title="REDO" mode="redo" onclick="redo()" data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
                             <img src="icon/redo.png" height="100%" alt="">
                         </span>
@@ -105,17 +106,19 @@
                                 <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">
                                     <div class="item-texture__image">
                                         <img src="../images/Draft_layout_daikin_US7_x6.png" alt="" onclick="setBgImage(this)">
+                                        
                                     </div>
                                 </a>
-                                <span><strong>Daikin US7 (2X)</strong></span>
+                                <span><strong>Floor Plan</strong></span>
                             </div>
                             <div class="pane-affix__catalog-column is-2">
                                 <a class="pane-affix__catalog-item item-texture is-shrink" data-link="room1">
                                     <div class="item-texture__image">
                                         <img src="../images/Draft_layout_daikin_US7_x6-90.png" alt="" onclick="setBgImage(this)">
+                                        <!--  -->
                                     </div>
                                 </a>
-                                <span><strong>Daikin Nexura (2X)</strong></span>
+                                <span><strong>Floor Plan 90 Degree</strong></span>
                             </div>
                         </div>
                     </div>
@@ -136,7 +139,8 @@
                             <div class="pane-affix__catalog-column is-2">
                                 <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">
                                     <div class="item-texture__image">
-                                        <img src="icon/daikin-us7.png" alt="daikin-us7" onclick="addImg(this)">
+                                        <img src="icon/daikin-us7.png" id="daikin-us7">
+                                        <!--  onclick="daikin_Us7.addImg(this)"-->
                                     </div>
                                 </a>
                                 <span><strong>Daikin US7 (2X)</strong></span>
@@ -144,10 +148,20 @@
                             <div class="pane-affix__catalog-column is-2">
                                 <a class="pane-affix__catalog-item item-texture is-shrink" data-link="room1">
                                     <div class="item-texture__image">
-                                        <img src="icon/daikin-us7.png" alt="daikin-nexura" onclick="addImg(this)">
+                                        <img src="icon/daikin-nexura.png" id="daikin-nexura">
+                                        <!--  onclick="daikin_Nexura.addImg(this)" -->
                                     </div>
                                 </a>
                                 <span><strong>Daikin Nexura (2X)</strong></span>
+                            </div>
+                            <div class="pane-affix__catalog-column is-2">
+                                <a class="pane-affix__catalog-item item-texture is-shrink" data-link="room1">
+                                    <div class="item-texture__image">
+                                        <img src="icon/daikin-temp.png" id="daikin-temp">
+                                        <!-- onclick="daikin_Temp.addImg(this)" -->
+                                    </div>
+                                </a>
+                                <span><strong>Daikin Temp (2X)</strong></span>
                             </div>
                         </div>
                     </div>
@@ -159,5 +173,4 @@
     <script src="js/fabric.js" type="text/javascript"></script>
     <script src="js/main.js" type="text/javascript"></script>
 </body>
-
 </html>
