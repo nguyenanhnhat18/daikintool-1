@@ -24,17 +24,6 @@ fabric.Object.prototype.setControlsVisibility({
     br:true, //bottom-right
     mtr:true 
 });
-// var HideControls = {
-//     'tl':true,
-//     'tr':false,
-//     'bl':false,
-//     'br':true,
-//     'ml':false,
-//     'mt':false,
-//     'mr':false,
-//     'mb':false,
-//     'mtr':true
-// };
 
 var canvas = new fabric.Canvas('c');
 canvas.counter = 0;
@@ -42,8 +31,17 @@ canvas.selection = false;
 let state = [];
 let mods = 0;
 
+check = false;
+function on_undo(IsUndo){
+    if(IsUndo === true){
+        return check = true;
+    }
+}
 
 let UpdateModif = (history)=>{
+    if(check === true && history === true){
+        mods = 0;
+    } 
     if(history === true){
         canvas.includeDefaultValues = false;
         myJson = canvas.toJSON(['setcontrolsVisibility', "id", "transparentCorners", "centeredScaling"]);
@@ -263,12 +261,12 @@ canvas.on('object:moving', (e)=>{
 let undo = ()=>{
     if (mods < state.length) {
         canvas.clear().renderAll();
-        canvas.loadFromJSON(state[state.length - 1 - mods - 1]);
-        
+        canvas.loadFromJSON(state[state.length - 1 - mods - 1]);        
         canvas.renderAll();
         // console.log("geladen " + (state.length-1-mods-1));
         // console.log("state " + state.length);
         mods += 1;
+        on_undo(true)
         // console.log("mods " + mods);
     }
     if(!canvas.getActiveObject()){
