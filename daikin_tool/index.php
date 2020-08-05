@@ -29,6 +29,11 @@
                             <img src="icon/redo.png" height="100%" alt="">
                         </span>
                     </div>
+                    <div class="b-header__item b-header__clear" id="clear" title="CLEAR" mode="clear" onclick="" data-modes="editor noauth">
+                        <span class="b-icon b-header__icon">
+                            <img src="icon/clear.png" height="100%" alt="">
+                        </span>
+                    </div>
                 </div>
                 <div class="b-header__center">
                     <div class="b-header__switch">
@@ -51,7 +56,7 @@
                         </span>
                         <div class="dropdown__content">
                             <div class="dropdown__menu">
-                                <a class="dropdown__item" mode="print">Print</a>
+                                <a class="dropdown__item" id="save" mode="print">Print</a>
                             </div>
                         </div>
                     </div>
@@ -105,8 +110,7 @@
                             <div class="pane-affix__catalog-column is-2">
                                 <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">
                                     <div class="item-texture__image">
-                                        <img src="../images/Draft_layout_daikin_US7_x6.png" alt="" onclick="setBgImage(this)">
-                                        
+                                        <img src="../images/Draft_layout_daikin_US7_x6.png" alt="" onclick="setBgImage(this)">                                        
                                     </div>
                                 </a>
                                 <span><strong>Floor Plan</strong></span>
@@ -169,7 +173,8 @@
             </div>            
         </div>
     </div>
-    <script src="js/jquery-3-5-1.js"></script>
+    <script src="js/jquery-3-5-1.js"></script>    
+    <script src="js/FileSaver.js" type="text/javascript"></script>
     <script src="js/fabric.js" type="text/javascript"></script>
     <script src="js/main.js" type="text/javascript"></script>
 </body>

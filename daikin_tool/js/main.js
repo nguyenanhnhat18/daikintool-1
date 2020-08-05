@@ -31,9 +31,12 @@ canvas.selection = false;
 let state = [];
 let mods = 0;
 
+let val = 1;
+val = (val*10 +  0.1*10)/10;
+
 check = false;
-function on_undo(IsUndo){
-    if(IsUndo === true){
+function on_undo(isUndo){
+    if(isUndo === true){
         return check = true;
     }
 }
@@ -82,28 +85,27 @@ class Daikin {
         }
         this.quantity < 0 ? this.updateQuantity() 
         : fabric.Image.fromURL(e.src, (oImg)=> {
-            let l = 150;
-            let t = 150;
+            let l = 1;
+            let t = 1;
             oImg.scale(0.2);
             oImg.set({"id":this.id});
             oImg.set({'left':l});
             oImg.set({'top':t});
             oImg.set({"transparentCorners" :false});
             oImg.set({"centeredScaling" :true});
-            // oImg.setControlsVisibility(HideControls);
+            
             canvas.add(oImg);
         });
         UpdateModif(true);        
     }
 
     checkQuantity(){
-        let curr_obj = 0;
-        
+        let curr_obj = 0;        
         if(state[state.length - 1 - mods] !== undefined){
-        let current_Obj_State = state[state.length - 1 - mods].objects;
-        if(current_Obj_State.length > 0){
-            for(let x in current_Obj_State){
-                if(this.id === current_Obj_State[x].id){
+        let current_State = state[state.length - 1 - mods].objects;
+        if(current_State.length > 0){
+            for(let x in current_State){
+                if(this.id === current_State[x].id){
                     curr_obj++
                 }
             }
@@ -133,25 +135,11 @@ $(document).on('click',".deleteBtn",()=>{daikin_Us7.delete()});
 $(document).on('click',".deleteBtn",()=>{daikin_Nexura.delete()});
 $(document).on('click',".deleteBtn",()=>{daikin_Temp.delete()});
 
-// add component
-$("#daikin-nexura").click(()=>{
-    daikin_Nexura.addImg($("#daikin-nexura")[0])
-})
-
-$("#daikin-temp").click(()=>{
-    daikin_Temp.addImg($("#daikin-temp")[0])
-})
-
-$("#daikin-us7").click(()=>{
-    daikin_Us7.addImg($("#daikin-us7")[0])
-})
-//end add component
-
 //create delete button
 function addDeleteBtn(x, y){
     $(".deleteBtn").remove(); 
-    var btnLeft = x-10;
-    var btnTop = y-10;
+    var btnLeft = x-5;
+    var btnTop = y-20;
     var deleteBtn = '<img src="icon/close-img.png" class="deleteBtn" style="position:absolute;top:'+btnTop+'px;left:'+btnLeft+'px;cursor:pointer;width:20px;height:20px;"/>';
     $(".canvas-container").append(deleteBtn);
 }
@@ -197,41 +185,96 @@ canvas.on('object:rotating',(e)=>{
 // end create delete butyon
 
 //add floor plan function
+let sizeOfcanvasBg
+let img
+
+function checkBgImage(check) {
+    if(check !== true){
+        alert("Please select Floor Plan to continue!");
+    } else {
+        // add component
+        $("#daikin-nexura").click(()=>{
+            daikin_Nexura.addImg($("#daikin-nexura")[0]);
+        });
+
+        $("#daikin-temp").click(()=>{
+            daikin_Temp.addImg($("#daikin-temp")[0]);
+        });
+
+        $("#daikin-us7").click(()=>{
+            daikin_Us7.addImg($("#daikin-us7")[0])
+        });//end add component
+    }
+}
 function setBgImage(ele){
-    // UpdateModif(true)
-    let img = ele;
-    let val = 1;
-    val = (val*10 +  0.15*10)/10;
-    let sizeOfcanvasBg = [img.naturalWidth, img.naturalHeight];
+    checkBgImage(true)
+    img = ele;
+    sizeOfcanvasBg = [img.naturalWidth, img.naturalHeight];
     canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
     canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
         // Needed to position backgroundImage at 0/0
         originX: 'left',
         originY: 'top'
     });
-
-    $("#zoomIn").click(()=>{
-        sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] * val), Math.round(sizeOfcanvasBg[1] * val)];
-        canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
-        canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
-            scaleX: canvas.width / img.naturalWidth,
-            scaleY: canvas.height / img.naturalHeight
-        });
-    })
-    
-    $("#zoomOut").click(()=>{
-        sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];
-              
-        canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
-        canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
-            scaleX: canvas.width / img.naturalWidth,
-            scaleY: canvas.height / img.naturalHeight
-        });
-    })
     //end button zoom in and zoom out function
-    $(".canvas-container")[0].style.margin = "auto";
+    $(".canvas-container")[0].style.margin = "auto";  
+    UpdateModif(true)  
 }
 
+$("#zoomIn").click(zoomInFunc = ()=>{        
+    sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] * val), Math.round(sizeOfcanvasBg[1] * val)];
+    canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
+    canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
+        scaleX: canvas.width / img.naturalWidth,
+        scaleY: canvas.height / img.naturalHeight
+    },UpdateModif(true));
+    for(let i in canvas._objects){
+        let oCoordskey = Object.keys(canvas._objects[i].oCoords);
+        
+        canvas._objects[i].left *= val;
+        canvas._objects[i].top *= val;
+
+        canvas._objects[i].translateX *= val;
+        canvas._objects[i].translateY *= val;
+        
+        for(let j in oCoordskey){
+            canvas._objects[i].oCoords[oCoordskey[j]].x *= val;
+            canvas._objects[i].oCoords[oCoordskey[j]].y *= val;                
+        }
+    }
+})
+
+$("#zoomOut").click(zoomOutFunc = ()=>{
+    sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];              
+    canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
+    canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
+        scaleX: canvas.width / img.naturalWidth,
+        scaleY: canvas.height / img.naturalHeight
+    },UpdateModif(true));
+    for(let i in canvas._objects){
+        let oCoordskey = Object.keys(canvas._objects[i].oCoords);
+
+        canvas._objects[i].left /= val;
+        canvas._objects[i].top /= val;
+
+        canvas._objects[i].translateX /= val;
+        canvas._objects[i].translateY /= val;
+
+        for(let j in oCoordskey){                
+            canvas._objects[i].oCoords[oCoordskey[j]].x /= val;
+            canvas._objects[i].oCoords[oCoordskey[j]].y /= val;         
+        }
+    }
+})
+
+$("#clear").click(()=>{
+    canvas.clear().renderAll()
+    canvas.setBackgroundImage("icon/blank.png",canvas.renderAll.bind(canvas),{
+        // Needed to position backgroundImage at 0/0
+        originX: 'left',
+        originY: 'top'
+    })
+});
 // canvas moving limit   
 canvas.on('object:moving', (e)=>{
     UpdateModif(false)
@@ -254,8 +297,6 @@ canvas.on('object:moving', (e)=>{
 });
 // end canvas moving limit
 
-
-
 /*////// UNDO  & REDO //////*/
 
 let undo = ()=>{
@@ -271,7 +312,7 @@ let undo = ()=>{
     }
     if(!canvas.getActiveObject()){
         $(".deleteBtn").remove(); 
-    }
+    }    
     daikin_Nexura.checkQuantity()
     daikin_Temp.checkQuantity()
     daikin_Us7.checkQuantity()
@@ -290,7 +331,7 @@ let redo = ()=>{
     }
     if(!canvas.getActiveObject()){
         $(".deleteBtn").remove(); 
-    }
+    }    
     daikin_Nexura.checkQuantity()
     daikin_Temp.checkQuantity()
     daikin_Us7.checkQuantity()
@@ -298,6 +339,25 @@ let redo = ()=>{
     
 }
 ////////END UNDO AND REDO //////////
+
+/////////////DOWNLOAD///////////////
+
+$("#save").click(()=>{
+    if(canvas.getActiveObject()){
+        alert("Please unselect components to continue!")
+    } else {
+        try {
+            err
+        } catch(err){
+            alert("Are you sure save it on your computer?")
+        } finally {
+            $("#c").get(0).toBlob((blob)=>{
+                saveAs(blob, `Daikin_Design_Quote_ ${Math.round((Math.random()*10000) + 1)}.png`)
+            })
+        }
+    }
+})    
+
 function renderIcon(icon) {
     return function renderIcon(ctx, left, top, styleOverride, fabricObject) {
     var size = this.cornerSize;
