@@ -26,6 +26,15 @@ fabric.Object.prototype.setControlsVisibility({
 });
 
 var canvas = new fabric.Canvas('c');
+
+$("#wrapCanvas").height = window.height;
+$("#wrapCanvas").width = window.width;
+
+$("#wrapCanvas").scroll(()=>{
+    canvas.calcOffset();
+});
+canvas.setBackgroundColor('white', canvas.renderAll.bind(canvas))
+
 canvas.counter = 0;
 canvas.selection = false;
 let state = [];
@@ -85,8 +94,8 @@ class Daikin {
         }
         this.quantity < 0 ? this.updateQuantity() 
         : fabric.Image.fromURL(e.src, (oImg)=> {
-            let l = 1;
-            let t = 1;
+            let l = canvas.width/2;
+            let t = canvas.height/2;
             oImg.scale(0.2);
             oImg.set({"id":this.id});
             oImg.set({'left':l});
@@ -129,11 +138,31 @@ class Daikin {
 let daikin_Temp = new Daikin(0, 2, "daikin-temp");
 let daikin_Nexura = new Daikin(0, 2, "daikin-nexura");
 let daikin_Us7 = new Daikin(0, 2, "daikin-us7");
+let daikin_OutDoor = new Daikin(0, 2, "daikin_outdoor");
+
+// add component
+$("#daikin-nexura").click(()=>{
+    daikin_Nexura.addImg($("#daikin-nexura")[0]);
+});
+
+$("#daikin-temp").click(()=>{
+    daikin_Temp.addImg($("#daikin-temp")[0]);
+});
+
+$("#daikin-us7").click(()=>{
+    daikin_Us7.addImg($("#daikin-us7")[0])
+});
+
+$("#daikin_outdoor").click(()=>{
+    daikin_OutDoor.addImg($("#daikin_outdoor")[0])
+});
+//end add component
 
 // add delete button
 $(document).on('click',".deleteBtn",()=>{daikin_Us7.delete()});
 $(document).on('click',".deleteBtn",()=>{daikin_Nexura.delete()});
 $(document).on('click',".deleteBtn",()=>{daikin_Temp.delete()});
+$(document).on('click',".deleteBtn",()=>{daikin_OutDoor.delete()});
 
 //create delete button
 function addDeleteBtn(x, y){
@@ -142,7 +171,8 @@ function addDeleteBtn(x, y){
     var btnTop = y-20;
     var deleteBtn = '<img src="icon/close-img.png" class="deleteBtn" style="position:absolute;top:'+btnTop+'px;left:'+btnLeft+'px;cursor:pointer;width:20px;height:20px;"/>';
     $(".canvas-container").append(deleteBtn);
-}
+};
+
 canvas.on('object:selected',(e)=>{
     UpdateModif(false)
     addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);
@@ -182,52 +212,45 @@ canvas.on('object:rotating',(e)=>{
     UpdateModif(false)
     $(".deleteBtn").remove(); 
 });
-// end create delete butyon
+// end create delete button
 
 //add floor plan function
-let sizeOfcanvasBg
+// let sizeOfcanvasBg
+// let img
+
+// function checkBgImage(check) {
+//     if(check !== true){
+//         alert("Please select Floor Plan to continue!");
+//     } else {
+        
+//     }
+// }
 let img
-
-function checkBgImage(check) {
-    if(check !== true){
-        alert("Please select Floor Plan to continue!");
-    } else {
-        // add component
-        $("#daikin-nexura").click(()=>{
-            daikin_Nexura.addImg($("#daikin-nexura")[0]);
-        });
-
-        $("#daikin-temp").click(()=>{
-            daikin_Temp.addImg($("#daikin-temp")[0]);
-        });
-
-        $("#daikin-us7").click(()=>{
-            daikin_Us7.addImg($("#daikin-us7")[0])
-        });//end add component
-    }
-}
+let sizeOfcanvasBg
 function setBgImage(ele){
-    checkBgImage(true)
+    // checkBgImage(true)
     img = ele;
     sizeOfcanvasBg = [img.naturalWidth, img.naturalHeight];
-    canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
+    canvas.setDimensions({width : img.naturalWidth + 20, height : img.naturalHeight + 20});
     canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
         // Needed to position backgroundImage at 0/0
         originX: 'left',
         originY: 'top'
     });
     //end button zoom in and zoom out function
-    $(".canvas-container")[0].style.margin = "auto";  
-    UpdateModif(true)  
+    $(".canvas-container")[0].style.margin = "auto";
+    $(".canvas-container")[0].style.top = "10%";
+    UpdateModif(true);
 }
 
 $("#zoomIn").click(zoomInFunc = ()=>{        
-    sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] * val), Math.round(sizeOfcanvasBg[1] * val)];
+    sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] * val), Math.round(sizeOfcanvasBg[1] * val)];    
     canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
     canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
+       
         scaleX: canvas.width / img.naturalWidth,
         scaleY: canvas.height / img.naturalHeight
-    },UpdateModif(true));
+    });
     for(let i in canvas._objects){
         let oCoordskey = Object.keys(canvas._objects[i].oCoords);
         
@@ -242,15 +265,17 @@ $("#zoomIn").click(zoomInFunc = ()=>{
             canvas._objects[i].oCoords[oCoordskey[j]].y *= val;                
         }
     }
+    UpdateModif(true);
+    console.log(state)
 })
 
 $("#zoomOut").click(zoomOutFunc = ()=>{
-    sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];              
+    sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];  
     canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
     canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
         scaleX: canvas.width / img.naturalWidth,
         scaleY: canvas.height / img.naturalHeight
-    },UpdateModif(true));
+    });     
     for(let i in canvas._objects){
         let oCoordskey = Object.keys(canvas._objects[i].oCoords);
 
@@ -264,20 +289,21 @@ $("#zoomOut").click(zoomOutFunc = ()=>{
             canvas._objects[i].oCoords[oCoordskey[j]].x /= val;
             canvas._objects[i].oCoords[oCoordskey[j]].y /= val;         
         }
-    }
+    }   
+    UpdateModif(true);
 })
 
 $("#clear").click(()=>{
-    canvas.clear().renderAll()
-    canvas.setBackgroundImage("icon/blank.png",canvas.renderAll.bind(canvas),{
-        // Needed to position backgroundImage at 0/0
-        originX: 'left',
-        originY: 'top'
-    })
+    canvas.clear().renderAll();
+    UpdateModif(true);
+    daikin_Nexura.checkQuantity();
+    daikin_Temp.checkQuantity();
+    daikin_Us7.checkQuantity();
+    canvas.setBackgroundColor('rgba(255, 255, 255, 255)', canvas.renderAll.bind(canvas));
 });
 // canvas moving limit   
 canvas.on('object:moving', (e)=>{
-    UpdateModif(false)
+    UpdateModif(false);
     var obj = e.target;
     // if object is too big ignore
     if(obj.currentHeight > obj.canvas.height || obj.currentWidth > obj.canvas.width){
@@ -316,7 +342,6 @@ let undo = ()=>{
     daikin_Nexura.checkQuantity()
     daikin_Temp.checkQuantity()
     daikin_Us7.checkQuantity()
-    UpdateModif(false);
 }
 
 let redo = ()=>{
@@ -334,9 +359,7 @@ let redo = ()=>{
     }    
     daikin_Nexura.checkQuantity()
     daikin_Temp.checkQuantity()
-    daikin_Us7.checkQuantity()
-    UpdateModif(false);
-    
+    daikin_Us7.checkQuantity()      
 }
 ////////END UNDO AND REDO //////////
 
@@ -344,17 +367,12 @@ let redo = ()=>{
 
 $("#save").click(()=>{
     if(canvas.getActiveObject()){
-        alert("Please unselect components to continue!")
+        confirm("Please unselect components to continue!")
     } else {
-        try {
-            err
-        } catch(err){
-            alert("Are you sure save it on your computer?")
-        } finally {
-            $("#c").get(0).toBlob((blob)=>{
-                saveAs(blob, `Daikin_Design_Quote_ ${Math.round((Math.random()*10000) + 1)}.png`)
-            })
-        }
+        confirm("Are you sure save this image on your computer?") ?
+        $("#c").get(0).toBlob((blob)=>{
+            saveAs(blob, `Daikin_Design_Quote_ ${Math.round((Math.random()*10000) + 1)}.png`)
+        }) : console.log()
     }
 })    
 

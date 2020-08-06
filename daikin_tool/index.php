@@ -9,8 +9,6 @@
     
     <link rel="stylesheet" type="text/css" href="css/util.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    
-    
 </head>
 
 <body>
@@ -64,7 +62,7 @@
             </header>
         </div>
         <div class="b-page__editor" id="editor">
-            <div class="workArea" id="wrapCanvas" style="position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <div class="workArea" id="wrapCanvas" style="overflow: scroll; top: 10%; background: gray">
                 <canvas id="c"></canvas>
             </div>
         </div>
@@ -166,6 +164,15 @@
                                     </div>
                                 </a>
                                 <span><strong>Daikin Temp (2X)</strong></span>
+                            </div>
+                            <div class="pane-affix__catalog-column is-2">
+                                <a class="pane-affix__catalog-item item-texture is-shrink" data-link="room1">
+                                    <div class="item-texture__image">
+                                        <img src="icon/daikin_outdoor.png" id="daikin_outdoor">
+                                        <!-- onclick="daikin_Temp.addImg(this)" -->
+                                    </div>
+                                </a>
+                                <span><strong>Daikin Out Door (2X)</strong></span>
                             </div>
                         </div>
                     </div>
