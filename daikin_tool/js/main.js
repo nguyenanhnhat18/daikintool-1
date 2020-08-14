@@ -85,7 +85,7 @@ class Daikin {
     
     updateQuantity(){
         this.quantity = 0;
-        alert(`Limited Quantity!\nPlease Delete Components`);
+        confirm(`Limited Quantity!\nPlease Delete Components`);
     }
     
     addImg(e){
@@ -141,21 +141,21 @@ let daikin_Us7 = new Daikin(0, 2, "daikin-us7");
 let daikin_OutDoor = new Daikin(0, 2, "daikin_outdoor");
 
 // add component
-$("#daikin-nexura").click(()=>{
+$("#daikin-nexura").click(()=>{            
     daikin_Nexura.addImg($("#daikin-nexura")[0]);
 });
 
-$("#daikin-temp").click(()=>{
+$("#daikin-temp").click(()=>{            
     daikin_Temp.addImg($("#daikin-temp")[0]);
 });
 
-$("#daikin-us7").click(()=>{
+$("#daikin-us7").click(()=>{            
     daikin_Us7.addImg($("#daikin-us7")[0])
 });
 
-$("#daikin_outdoor").click(()=>{
+$("#daikin_outdoor").click(()=>{            
     daikin_OutDoor.addImg($("#daikin_outdoor")[0])
-});
+});        
 //end add component
 
 // add delete button
@@ -215,20 +215,19 @@ canvas.on('object:rotating',(e)=>{
 // end create delete button
 
 //add floor plan function
-// let sizeOfcanvasBg
-// let img
-
-// function checkBgImage(check) {
-//     if(check !== true){
-//         alert("Please select Floor Plan to continue!");
-//     } else {
-        
-//     }
-// }
+ let checkBgImage = (bool)=> {
+    
+    if(bool !== true){
+        confirm("Please select Floor Plan to continue!");
+    } 
+    if(bool === true) {
+       
+    }
+}
 let img
 let sizeOfcanvasBg
-function setBgImage(ele){
-    // checkBgImage(true)
+function setBgImage(ele){    
+    
     img = ele;
     sizeOfcanvasBg = [img.naturalWidth, img.naturalHeight];
     canvas.setDimensions({width : img.naturalWidth, height : img.naturalHeight});
@@ -380,12 +379,25 @@ $("#save").click(()=>{
     } else {
         confirm("Are you sure save this image on your computer?") ?
         $('#c').get(0).toBlob((blob)=>{
-            saveAs(blob, `Daikin_Design_Quote_ ${Math.floor(100000 + Math.random() * 900000)}.png`);          
-        }) : console.log("Download was canceled!");        
-    }    
+            let name = `Daikin_Design_Quote_${Math.floor(100000 + Math.random() * 900000)}.png`;
+            saveAs(blob, name);
+            let dataURL = $('#c').get(0).toDataURL();
+            $.ajax({
+                type: "POST",
+                url: "upload.php",
+                data: { 
+                    base64Img: dataURL,
+                    QuoteId: name
+                }               
+              }).done(function(o) {
+                console.log('saved');
+              });
+        }) : console.log("Download was canceled!");      
+    }
 })
 
-/////////////END DOWNLOAD///////////////    
+console.log()
+/////////////END DOWNLOAD///////////////
 function renderIcon(icon) {
     return function renderIcon(ctx, left, top, styleOverride, fabricObject) {
     var size = this.cornerSize;

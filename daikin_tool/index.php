@@ -62,7 +62,7 @@
             </header>
         </div>
         <div class="b-page__editor" id="editor">
-            <div class="workArea" id="wrapCanvas" style="overflow: scroll; top: 10%; background: gray">
+            <div class="workArea" id="wrapCanvas" style="overflow: auto; top: 10%; background: gray">
                 <canvas id="c"></canvas>
             </div>
         </div>
