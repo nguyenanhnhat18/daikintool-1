@@ -8,7 +8,7 @@ $fields['username_password'] = 'pureandtrue2020*';
 $fields['module'] = 'Users';
 $fields['action'] = 'Authenticate';
 
-$url = 'http://new.suitecrm-pure.com/';
+$url = 'https://suitecrm.pure-electric.com.au/';
 $curl = curl_init();
 
 curl_setopt($curl, CURLOPT_URL, $url);
@@ -28,7 +28,7 @@ $request_data = array(
     'quote_id' => $_POST['quote_id'],
 );
 
-$source = "http://new.suitecrm-pure.com/index.php?entryPoint=APIGetDataProductLinesFromQuote";
+$source = "https://suitecrm.pure-electric.com.au/index.php?entryPoint=APIGetDataProductLinesFromQuote";
 
 curl_setopt($curl, CURLOPT_URL, $source);
 curl_setopt($curl, CURLOPT_COOKIEJAR, $tmpfsuitename);

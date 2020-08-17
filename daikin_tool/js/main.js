@@ -265,7 +265,6 @@ class Daikin {
         this.quantity = this.count - this.quantity;
     }
 }
-
     delete(){
         if(canvas.getActiveObject() && this.id === canvas.getActiveObject().id){
             this._OnDel();
@@ -277,33 +276,42 @@ class Daikin {
 }
 
 //create objects
-let daikin_Temp = new Daikin(0, 2, "daikin-temp");
-let daikin_Nexura = new Daikin(0, 2, "daikin-nexura");
+// let daikin_Temp = new Daikin(0, 2, "daikin-temp");
+// let daikin_Nexura = new Daikin(0, 2, "daikin-nexura");
 let daikin_Us7 = new Daikin(0, 2, "daikin-us7");
 let daikin_OutDoor = new Daikin(0, 2, "daikin_outdoor");
 
 // add component
-$("#daikin-nexura").click(()=>{            
-    daikin_Nexura.addImg($("#daikin-nexura")[0]);
+// $("#daikin-nexura").click(()=>{            
+//     daikin_Nexura.addImg($("#daikin-nexura")[0]);
+// });
+
+// $("#daikin-temp").click(()=>{            
+//     daikin_Temp.addImg($("#daikin-temp")[0]);
+// });
+let checkbackground = ()=>{
+    if(canvas.backgroundImage === null){
+        alert("Background please")
+    }
+}
+$("#daikin-option").on('click', '#daikin-us7', ()=>{
+    // old error code daikin_OutDoor.addImg($("#daikin_outdoor")[0])
+    checkbackground();       
+    daikin_Us7.addImg($("#daikin-us7")[0]);
+    
 });
 
-$("#daikin-temp").click(()=>{            
-    daikin_Temp.addImg($("#daikin-temp")[0]);
-});
-
-$("#daikin-option").on('click', '#daikin-us7', ()=>{      
-    daikin_OutDoor.addImg($("#daikin-us7")[0])
-});
-
-$("#daikin-option").on('click', '#daikin_outdoor', ()=>{      
+$("#daikin-option").on('click', '#daikin_outdoor', ()=>{ 
+    checkbackground();     
     daikin_OutDoor.addImg($("#daikin_outdoor")[0])
-});        
+});
+        
 //end add component
 
 // add delete button
 $(document).on('click',".deleteBtn",()=>{daikin_Us7.delete()});
-$(document).on('click',".deleteBtn",()=>{daikin_Nexura.delete()});
-$(document).on('click',".deleteBtn",()=>{daikin_Temp.delete()});
+// $(document).on('click',".deleteBtn",()=>{daikin_Nexura.delete()});
+// $(document).on('click',".deleteBtn",()=>{daikin_Temp.delete()});
 $(document).on('click',".deleteBtn",()=>{daikin_OutDoor.delete()});
 
 //create delete button
@@ -357,19 +365,11 @@ canvas.on('object:rotating',(e)=>{
 // end create delete butyon
 
 //add floor plan function
- let checkBgImage = (bool)=> {
-    
-    if(bool !== true){
-        confirm("Please select Floor Plan to continue!");
-    } 
-    if(bool === true) {
-       
-    }
-}
+
 let img
-let sizeOfcanvasBg
+let sizeOfcanvasBg;
+
 function setBgImage(ele){    
-    
     img = ele;
     sizeOfcanvasBg = [img.naturalWidth, img.naturalHeight];
     canvas.setDimensions({width : img.naturalWidth, height : img.naturalHeight});
@@ -384,7 +384,7 @@ function setBgImage(ele){
     UpdateModif(true);
 }
 
-$("#zoomIn").click(zoomInFunc = ()=>{        
+$("#zoomIn").click(()=>{        
     sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] * val), Math.round(sizeOfcanvasBg[1] * val)];
     canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
     canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
@@ -408,7 +408,7 @@ $("#zoomIn").click(zoomInFunc = ()=>{
     UpdateModif(true);
 })
 
-$("#zoomOut").click(zoomOutFunc = ()=>{
+$("#zoomOut").click(()=>{
     sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];              
     canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
     canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
@@ -435,9 +435,10 @@ $("#zoomOut").click(zoomOutFunc = ()=>{
 $("#clear").click(()=>{
     canvas.clear().renderAll();
     UpdateModif(true);
-    daikin_Nexura.checkQuantity();
-    daikin_Temp.checkQuantity();
+    // daikin_Nexura.checkQuantity();
+    // daikin_Temp.checkQuantity();
     daikin_Us7.checkQuantity();
+    daikin_OutDoor.checkQuantity();
     canvas.setBackgroundColor('rgba(255, 255, 255, 255)', canvas.renderAll.bind(canvas));
 });
 // canvas moving limit   
@@ -478,13 +479,16 @@ let undo = ()=>{
     if(!canvas.getActiveObject()){
         $(".deleteBtn").remove(); 
     }
-    daikin_Nexura.checkQuantity();
-    daikin_Temp.checkQuantity();
+    // daikin_Nexura.checkQuantity();
+    // daikin_Temp.checkQuantity();
     daikin_Us7.checkQuantity();
-    if(state[state.length - 1 - mods].backgroundImage !== undefined){
+    daikin_OutDoor.checkQuantity();
+    if(canvas.backgroundImage !== null &&
+       state[state.length - 1 - mods].backgroundImage.scaleX !== undefined &&
+       state[state.length - 1 - mods].backgroundImage.scaleY !== undefined){
         let state_width = state[state.length - 1 - mods].backgroundImage.width * state[state.length - 1 - mods].backgroundImage.scaleX;
         let state_height = state[state.length - 1 - mods].backgroundImage.height * state[state.length - 1 - mods].backgroundImage.scaleY;
-        canvas.setDimensions({width: state_width, height: state_height})
+            canvas.setDimensions({width: state_width, height: state_height})
     }
 }
 
@@ -501,16 +505,18 @@ let redo = ()=>{
     if(!canvas.getActiveObject()){
         $(".deleteBtn").remove(); 
     }
-    daikin_Nexura.checkQuantity();
-    daikin_Temp.checkQuantity();
+    // daikin_Nexura.checkQuantity();
+    // daikin_Temp.checkQuantity();
     daikin_Us7.checkQuantity();
-    if(state[state.length - 1 - mods].backgroundImage !== undefined){
-        let state_width = state[state.length - 1 - mods].backgroundImage.width * state[state.length - 1 - mods].backgroundImage.scaleX;
-        let state_height = state[state.length - 1 - mods].backgroundImage.height * state[state.length - 1 - mods].backgroundImage.scaleY;
-        canvas.setDimensions({width: state_width, height: state_height})
+    daikin_OutDoor.checkQuantity();
+    if(state[state.length - 1 - mods].backgroundImage !== undefined &&
+       state[state.length - 1 - mods].backgroundImage.scaleX !== undefined &&
+       state[state.length - 1 - mods].backgroundImage.scaleY !== undefined){
+           let state_width = state[state.length - 1 - mods].backgroundImage.width * state[state.length - 1 - mods].backgroundImage.scaleX;
+           let state_height = state[state.length - 1 - mods].backgroundImage.height * state[state.length - 1 - mods].backgroundImage.scaleY;
+           canvas.setDimensions({width: state_width, height: state_height})
+        }
     }
-    
-}
 ////////END UNDO AND REDO //////////
 
 /////////////DOWNLOAD///////////////

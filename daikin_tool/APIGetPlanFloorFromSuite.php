@@ -8,7 +8,7 @@ $fields['username_password'] = 'pureandtrue2020*';
 $fields['module'] = 'Users';
 $fields['action'] = 'Authenticate';
 
-$url = 'http://new.suitecrm-pure.com/';
+$url = 'https://suitecrm.pure-electric.com.au/';
 $curl = curl_init();
 
 curl_setopt($curl, CURLOPT_URL, $url);
@@ -31,7 +31,7 @@ $request_data = array(
     'pre_install_photos_c' => $_POST['pre_install_photos_c'],
 );
 
-$source = "http://new.suitecrm-pure.com/index.php?entryPoint=APIDownloadFilesFromSuiteToDaiKinDesignTool";
+$source = "https://suitecrm.pure-electric.com.au/index.php?entryPoint=APIDownloadFilesFromSuiteToDaiKinDesignTool";
 
 curl_setopt($curl, CURLOPT_URL, $source);
 curl_setopt($curl, CURLOPT_COOKIEJAR, $tmpfsuitename);
@@ -49,7 +49,7 @@ curl_close($curl);
 $listFile = json_decode($result, true);
 
 if(count($listFile) > 0) {
-    $url = 'http://new.suitecrm-pure.com/custom/include/SugarFields/Fields/Multiupload/server/php/files/'.$_POST['pre_install_photos_c'].'/';
+    $url = 'https://suitecrm.pure-electric.com.au/custom/include/SugarFields/Fields/Multiupload/server/php/files/'.$_POST['pre_install_photos_c'].'/';
     $file_name = basename($url);
     $path = 'files/'.$_POST['quote_id'].'/';
     if (!file_exists($path)) {
@@ -73,7 +73,7 @@ if(count($listFile) > 0) {
         'pre_install_photos_c' => $_POST['pre_install_photos_c'],
     );
     
-    $source = "http://new.suitecrm-pure.com/index.php?entryPoint=getPhotosFloorPlan";
+    $source = "https://suitecrm.pure-electric.com.au/index.php?entryPoint=getPhotosFloorPlan";
     
     curl_setopt($curl, CURLOPT_URL, $source);
     curl_setopt($curl, CURLOPT_COOKIEJAR, $tmpfsuitename);
@@ -94,7 +94,7 @@ if(count($listFile) > 0) {
             'pre_install_photos_c' => $_POST['pre_install_photos_c'],
         );
         
-        $source = "http://new.suitecrm-pure.com/index.php?entryPoint=APIDownloadFilesFromSuiteToDaiKinDesignTool";
+        $source = "https://suitecrm.pure-electric.com.au/index.php?entryPoint=APIDownloadFilesFromSuiteToDaiKinDesignTool";
         
         curl_setopt($curl, CURLOPT_URL, $source);
         curl_setopt($curl, CURLOPT_COOKIEJAR, $tmpfsuitename);
@@ -112,7 +112,7 @@ if(count($listFile) > 0) {
         $listFile = json_decode($result, true);
 
         if(count($listFile) > 0) {
-            $url = 'http://new.suitecrm-pure.com/custom/include/SugarFields/Fields/Multiupload/server/php/files/'.$_POST['pre_install_photos_c'].'/';
+            $url = 'https://suitecrm.pure-electric.com.au/custom/include/SugarFields/Fields/Multiupload/server/php/files/'.$_POST['pre_install_photos_c'].'/';
             $file_name = basename($url);
             $path = 'files/'.$_POST['quote_id'].'/';
             if (!file_exists($path)) {
