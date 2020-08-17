@@ -20,15 +20,20 @@
         <div class="b-page__header">
             <header class="b-header">
                 <div class="b-header__left">
-                    <div class="b-header__item b-header__undo" id="" mode="undo"   data-modes="editor noauth">
+                    <div class="b-header__item b-header__undo" id="" title="UNDO" mode="undo" onclick="undo()"  data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
                             <img src="icon/undo.png" height="100%" alt="">
                         </span>
                     </div>
-                    <div class="b-header__item b-header__redo is-disabled" mode="redo"  
-                        data-modes="editor noauth">
+                    <!-- is-disabled -->
+                    <div class="b-header__item b-header__redo" id="" title="REDO" mode="redo" onclick="redo()" data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
                             <img src="icon/redo.png" height="100%" alt="">
+                        </span>
+                    </div>
+                    <div class="b-header__item b-header__clear" id="clear" title="CLEAR" mode="clear" onclick="" data-modes="editor noauth">
+                        <span class="b-icon b-header__icon">
+                            <img src="icon/clear.png" height="100%" alt="">
                         </span>
                     </div>
                 </div>
@@ -53,7 +58,7 @@
                         </span>
                         <div class="dropdown__content">
                             <div class="dropdown__menu">
-                                <a class="dropdown__item" mode="print">Print</a>
+                                <a class="dropdown__item" id="save" mode="print">Print</a>
                             </div>
                         </div>
                     </div>
@@ -61,34 +66,34 @@
             </header>
         </div>
         <div class="b-page__editor" id="editor">
-            <div class="workArea" id="wrapCanvas">
+            <div class="workArea" id="wrapCanvas" style="overflow: auto; top: 10%; background: gray">
                 <canvas id="c"></canvas>
             </div>
         </div>
         <div id="editorControls"  >
             <div class="pane-point">
-                <button class="pane-point__button pane-point__button--enhance" mode="zoomIn">
+                <button class="pane-point__button pane-point__button--enhance" mode="zoomIn" id="zoomIn">
                     <span class="b-icon is-24">
                         <img src="icon/plus.png" alt="">
                     </span>
                 </button>
-                <button class="pane-point__button pane-point__button--reduce" mode="zoomOut">
+                <button class="pane-point__button pane-point__button--reduce" mode="zoomOut" id="zoomOut">
                     <span class="b-icon is-24">
                         <img src="icon/minus.png" alt="">
                     </span>
                 </button>
             </div>
             <div class="pane-nav js-pane-nav" id="leftPanel"   data-modes="editor|noauth">
-                <div class="pane-nav__item js-pane-nav-item is-selected" data-href="daikin-option" content="4" data-id="0"
-                    data-type="daikin-option">
-                    <span class="pane-nav__item-icon">
-                        <img src="icon/air.png" alt="">
-                    </span>
-                </div>
-                <div class="pane-nav__item js-pane-nav-item" data-href="floor-plan-option" content="1" data-id="1"
+                <div class="pane-nav__item js-pane-nav-item is-selected" data-href="floor-plan-option" content="1" data-id="1"
                     data-type="floor-plan-option">
                     <span class="pane-nav__item-icon">
                         <img src="icon/floor-plan.png" alt="">
+                    </span>
+                </div>
+                <div class="pane-nav__item js-pane-nav-item" data-href="daikin-option" content="4" data-id="0"
+                    data-type="daikin-option">
+                    <span class="pane-nav__item-icon">
+                        <img src="icon/air.png" alt="">
                     </span>
                 </div>
             </div>
@@ -137,13 +142,12 @@
         </div>
     </div>
     <div class="loading">
-        <img src="icon/loading.svg" alt="">
+        <!-- <img src="icon/loading.svg" alt=""> -->
+        <img src="icon/upload.gif" alt="" style="width: 300px">
         <h3>Preparing Daikin Option</h3>
     </div>
-    <script
-        src="https://code.jquery.com/jquery-3.5.1.js"
-        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
-        crossorigin="anonymous"></script>
+    <script src="js/jquery-3-5-1.js"></script>    
+    <script src="js/FileSaver.js" type="text/javascript"></script>
     <script src="js/fabric.min.js" type="text/javascript"></script>
     <script src="js/main.js" type="text/javascript"></script>
 </body>
