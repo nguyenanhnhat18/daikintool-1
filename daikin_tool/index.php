@@ -10,6 +10,7 @@
 
     <link rel="stylesheet" type="text/css" href="css/util.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="lib/jquery-ui-1.12.1/jquery-ui.css">
 
 </head>
 
@@ -83,7 +84,7 @@
                     </span>
                 </button>
             </div>
-            <div class="pane-nav js-pane-nav" id="leftPanel"   data-modes="editor|noauth">
+            <div class="pane-nav js-pane-nav" id="leftPanel" data-modes="editor|noauth">
                 <div class="pane-nav__item js-pane-nav-item is-selected" data-href="floor-plan-option" content="1" data-id="1"
                     data-type="floor-plan-option">
                     <span class="pane-nav__item-icon">
@@ -146,9 +147,14 @@
         <img src="icon/upload.gif" alt="" style="width: 300px">
         <h3>Preparing Daikin Option</h3>
     </div>
+    <div id='pano'></div>
+    <div id='modal_dialog'>
+    <div class='message'></div>
+    </div>
     <script src="js/jquery-3-5-1.js"></script>    
     <script src="js/FileSaver.js" type="text/javascript"></script>
-    <script src="js/fabric.min.js" type="text/javascript"></script>
+    <script src="js/fabric.js" type="text/javascript"></script>
+    <script src="lib/jquery-ui-1.12.1/jquery-ui.js" type="text/javascript"></script>
     <script src="js/main.js" type="text/javascript"></script>
 </body>
 

@@ -6,10 +6,10 @@
 #HttpOnly_.suitecrm.devel.pure-electric.com.au	TRUE	/	FALSE	1600915126	ck_login_id_20	1
 #HttpOnly_suitecrm.devel.pure-electric.com.au	FALSE	/	FALSE	1624675127	sugar_user_theme	SuiteP
 #HttpOnly_suitecrm-pure.local	FALSE	/	FALSE	1604558646	sugar_user_theme	SuiteP
-#HttpOnly_suitecrm.pure-electric.com.au	FALSE	/	TRUE	1629203753	sugar_user_theme	SuiteP
-#HttpOnly_.suitecrm.pure-electric.com.au	TRUE	/	TRUE	1605443752	ck_login_id_20	1
-#HttpOnly_.suitecrm.pure-electric.com.au	TRUE	/	TRUE	1605443752	ck_login_language_20	en_us
+#HttpOnly_suitecrm.pure-electric.com.au	FALSE	/	TRUE	1629371264	sugar_user_theme	SuiteP
+#HttpOnly_.suitecrm.pure-electric.com.au	TRUE	/	TRUE	1605611262	ck_login_id_20	1
+#HttpOnly_.suitecrm.pure-electric.com.au	TRUE	/	TRUE	1605611262	ck_login_language_20	en_us
 #HttpOnly_new.suitecrm-pure.com	FALSE	/	FALSE	1626492489	sugar_user_theme	SuiteP
 #HttpOnly_.new.suitecrm-pure.com	TRUE	/	FALSE	1602732487	ck_login_id_20	1
 #HttpOnly_.new.suitecrm-pure.com	TRUE	/	FALSE	1602732487	ck_login_language_20	en_us
-suitecrm.pure-electric.com.au	FALSE	/	FALSE	1597811744	PHPSESSID	2nrtau362pmsfvg9779k9v0bic
+suitecrm.pure-electric.com.au	FALSE	/	FALSE	1597979255	PHPSESSID	4f2isfa9d67caolf879cbpqeks
