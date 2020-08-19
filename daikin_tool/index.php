@@ -147,7 +147,6 @@
         <img src="icon/upload.gif" alt="" style="width: 300px">
         <h3>Preparing Daikin Option</h3>
     </div>
-    <div id='pano'></div>
     <div id='modal_dialog'>
     <div class='message'></div>
     </div>

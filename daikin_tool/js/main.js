@@ -282,7 +282,13 @@ function on_undo(isUndo){
 }
 
 let UpdateModif = (history)=>{
+    let i = 0;
     if(check === true && history === true){
+        while(i < mods){
+            state.pop()
+            i++            
+        }
+        console.log(mods);
         mods = 0;
     } 
     if(history === true){
@@ -553,6 +559,7 @@ let undo = ()=>{
         on_undo(true)
         // console.log("mods " + mods);
     }
+    canvas.discardActiveObject().renderAll();
     $(".deleteBtn").remove();     
     // daikin_Nexura.checkQuantity();
     // daikin_Temp.checkQuantity();
@@ -577,6 +584,7 @@ let redo = ()=>{
         // console.log("state " + state.length);
         // console.log("mods " + mods);
     }
+    canvas.discardActiveObject().renderAll();
     $(".deleteBtn").remove();
     // daikin_Nexura.checkQuantity();
     // daikin_Temp.checkQuantity();
