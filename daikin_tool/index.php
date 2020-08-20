@@ -1,18 +1,28 @@
-<!DOCTYPE html>
-<html lang="en"></html>
+
+<html lang="en">
+
+
 <head>
     <title>Daikin Design Tool By Pure Electric</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- <link rel="icon" type="image/png" href="images/icons/favicon.ico" /> -->
-    
+
+    <link rel="icon" type="image/png" href="icon/logo_pure_icon.png" />
+
     <link rel="stylesheet" type="text/css" href="css/util.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="lib/jquery-ui-1.12.1/jquery-ui.css">
+
+
 </head>
 
 <body>
     <div class="wrapper">
+
+        <input type="hidden" id="quote_id" value="">
+        <input type="hidden" id="pre_install_photos_c" value="">
+
         <div class="b-page__header">
             <header class="b-header">
                 <div class="b-header__left">
@@ -40,9 +50,11 @@
                                 <img src="icon/logoPure.png" height="100%" alt=""><span style="margin-left: 10px">Pure
                                     Electric</span>
                             </div>
-                            <div class="b-switch__item js-switch-item" mode="view3d">
+
+                            <!-- <div class="b-switch__item js-switch-item" mode="view3d">
                                 <img src="icon/Daikin_logo_white_background.png" height="100%" alt="">
-                            </div>
+                            </div> -->
+
                         </div>
                     </div>
                 </div>
@@ -62,7 +74,9 @@
             </header>
         </div>
         <div class="b-page__editor" id="editor">
-            <div class="workArea" id="wrapCanvas" style="overflow: auto; top: 10%; background: gray">
+
+            <div class="workArea" id="wrapCanvas">
+
                 <canvas id="c"></canvas>
             </div>
         </div>
@@ -79,7 +93,9 @@
                     </span>
                 </button>
             </div>
-            <div class="pane-nav js-pane-nav" id="leftPanel"   data-modes="editor|noauth">
+
+            <div class="pane-nav js-pane-nav" id="leftPanel" data-modes="editor|noauth">
+
                 <div class="pane-nav__item js-pane-nav-item is-selected" data-href="floor-plan-option" content="1" data-id="1"
                     data-type="floor-plan-option">
                     <span class="pane-nav__item-icon">
@@ -91,39 +107,7 @@
                     <span class="pane-nav__item-icon">
                         <img src="icon/air.png" alt="">
                     </span>
-                </div>                
-            </div>
-            <div id="floor-plan-option" class="pane-affix pane-affix--catalog js-pane-affix is-active" data-target="floor-plan">
-                <div class="pane-affix__container">
-                    <div class="pane-affix__header">
-                        <div class="pane-affix__header-title js-pane-affix-link" data-href="construction">
-                            <div class="pane-affix__header-title-label">Floor Plan</div>
-                        </div>
-                        <div class="pane-affix__header-close js-pane-affix-close"><span class="b-icon is-24">
-                            <img style="width: 25px;" src="icon/close.png" alt="">
-                        </div>
-                    </div>
-                    <div class="pane-affix__content pane-affix__content--type-catalog">
-                        <div class="pane-affix__catalog" id="roomsItems">
-                            <div class="pane-affix__catalog-column is-2">
-                                <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">
-                                    <div class="item-texture__image">
-                                        <img src="../images/Draft_layout_daikin_US7_x6.png" alt="" onclick="setBgImage(this)">                                        
-                                    </div>
-                                </a>
-                                <span><strong>Floor Plan</strong></span>
-                            </div>
-                            <div class="pane-affix__catalog-column is-2">
-                                <a class="pane-affix__catalog-item item-texture is-shrink" data-link="room1">
-                                    <div class="item-texture__image">
-                                        <img src="../images/Draft_layout_daikin_US7_x6-90.png" alt="" onclick="setBgImage(this)">
-                                        <!--  -->
-                                    </div>
-                                </a>
-                                <span><strong>Floor Plan 90 Degree</strong></span>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
             </div>
             <div id="daikin-option" class="pane-affix pane-affix--catalog js-pane-affix" data-target="daikin">
@@ -137,52 +121,55 @@
                         </div>
                     </div>
                     <div class="pane-affix__content pane-affix__content--type-catalog">
-                        <div class="pane-affix__catalog" id="roomsItems">
-                            <div class="pane-affix__catalog-column is-2">
-                                <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">
-                                    <div class="item-texture__image">
-                                        <img src="icon/daikin-us7.png" id="daikin-us7">
-                                        <!--  onclick="daikin_Us7.addImg(this)"-->
-                                    </div>
-                                </a>
-                                <span><strong>Daikin US7 (2X)</strong></span>
-                            </div>
-                            <div class="pane-affix__catalog-column is-2">
-                                <a class="pane-affix__catalog-item item-texture is-shrink" data-link="room1">
-                                    <div class="item-texture__image">
-                                        <img src="icon/daikin-nexura.png" id="daikin-nexura">
-                                        <!--  onclick="daikin_Nexura.addImg(this)" -->
-                                    </div>
-                                </a>
-                                <span><strong>Daikin Nexura (2X)</strong></span>
-                            </div>
-                            <div class="pane-affix__catalog-column is-2">
-                                <a class="pane-affix__catalog-item item-texture is-shrink" data-link="room1">
-                                    <div class="item-texture__image">
-                                        <img src="icon/daikin-temp.png" id="daikin-temp">
-                                        <!-- onclick="daikin_Temp.addImg(this)" -->
-                                    </div>
-                                </a>
-                                <span><strong>Daikin Temp (2X)</strong></span>
-                            </div>
-                            <div class="pane-affix__catalog-column is-2">
-                                <a class="pane-affix__catalog-item item-texture is-shrink" data-link="room1">
-                                    <div class="item-texture__image">
-                                        <img src="icon/daikin_outdoor.png" id="daikin_outdoor">
-                                        <!-- onclick="daikin_Temp.addImg(this)" -->
-                                    </div>
-                                </a>
-                                <span><strong>Daikin Out Door (2X)</strong></span>
-                            </div>
+                        <div class="pane-affix__catalog" id="daikinItems">
+                            <!-- Add Daikin Devices Here -->
+
                         </div>
                     </div>
                 </div>
-            </div>            
+            </div>
+
+            <div id="floor-plan-option" class="pane-affix pane-affix--catalog js-pane-affix" data-target="floor-plan">
+                <div class="pane-affix__container">
+                    <div class="pane-affix__header">
+                        <div class="pane-affix__header-title js-pane-affix-link" data-href="construction">
+                            <div class="pane-affix__header-title-label">Floor Plan</div>
+                        </div>
+                        <div class="pane-affix__header-close js-pane-affix-close"><span class="b-icon is-24">
+                            <img style="width: 25px;" src="icon/close.png" alt="">
+                        </div>
+                    </div>
+                    <div class="pane-affix__content pane-affix__content--type-catalog">
+                        <div class="pane-affix__catalog" id="FloorItems">
+                            <!-- Add Plan Floor -->
+                        </div>
+                    </div>
+                    <div class="pane-floor_upload-file">
+                        <form id="uploadFloor" action method="POST" enctype="multipart/form-data">
+                            <div class="upload-btn-wrapper">
+                                <button class="btn">Upload</button>
+                                <input type="file" id="area-upload" name="floor_image[]" accept="image/*" multiple />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+    <div class="loading">
+        <!-- <img src="icon/loading.svg" alt=""> -->
+        <img src="icon/upload.gif" alt="" style="width: 300px">
+        <h3>Preparing Daikin Option</h3>
+    </div>
+    <div id='modal_dialog'>
+    <div class='message'></div>
     </div>
     <script src="js/jquery-3-5-1.js"></script>    
     <script src="js/FileSaver.js" type="text/javascript"></script>
     <script src="js/fabric.js" type="text/javascript"></script>
+    <script src="lib/jquery-ui-1.12.1/jquery-ui.js" type="text/javascript"></script>
     <script src="js/main.js" type="text/javascript"></script>
 </body>
+
+
 </html>
