@@ -33,7 +33,8 @@
                 $('#'+dataType).removeClass('is-active');
                 $(".deleteBtn").remove();
                 canvas.clear().renderAll();
-                check = false;                                
+                check = false;
+                undo_redo_enable(state , mods);                                
             })            
         });
     });
@@ -309,7 +310,8 @@ let UpdateModif = (history)=>{
         start = (state.length-1-mods-1) ;
         del_num = mods;
         state.splice(start + 1, del_num);
-        mods = 0;        
+        mods = 0;
+        undo_redo_enable(state , mods);        
     }
 }
 
