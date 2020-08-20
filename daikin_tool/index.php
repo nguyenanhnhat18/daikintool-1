@@ -21,13 +21,13 @@
         <div class="b-page__header">
             <header class="b-header">
                 <div class="b-header__left">
-                    <div class="b-header__item b-header__undo" id="" title="UNDO" mode="undo" onclick="undo()"  data-modes="editor noauth">
+                    <div class="b-header__item b-header__undo is-disabled" id="undoBtn" title="UNDO" mode="undo" onclick="undo()"  data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
                             <img src="icon/undo.png" height="100%" alt="">
                         </span>
                     </div>
                     <!-- is-disabled -->
-                    <div class="b-header__item b-header__redo" id="" title="REDO" mode="redo" onclick="redo()" data-modes="editor noauth">
+                    <div class="b-header__item b-header__redo is-disabled" id="redoBtn" title="REDO" mode="redo" onclick="redo()" data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
                             <img src="icon/redo.png" height="100%" alt="">
                         </span>
