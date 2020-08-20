@@ -379,8 +379,8 @@ function setBgImage(ele){
         originY: 'top'
     });
     //end button zoom in and zoom out function
-    $(".canvas-container")[0].style.margin = "auto";
-    $(".canvas-container")[0].style.top = "10%";
+    // $(".canvas-container")[0].style.margin = "auto";
+    // $(".canvas-container")[0].style.top = "10%";
     UpdateModif(true);
 }
 
@@ -528,14 +528,16 @@ $("#save").click(()=>{
         confirm("Are you sure save this image on your computer?") ?
         $('#c').get(0).toBlob((blob)=>{
             let name = `Daikin_Design_Quote_${Math.floor(100000 + Math.random() * 900000)}.png`;
+            let quote_id = $('#quote_id').val();
             saveAs(blob, name);
             let dataURL = $('#c').get(0).toDataURL();
             $.ajax({
                 type: "POST",
-                url: "upload.php",
+                url: "APIUploadToFolderAndGeneratePDF.php",
                 data: { 
                     base64Img: dataURL,
-                    QuoteId: name
+                    name: name,
+                    quote_id: quote_id
                 }               
               }).done(function(o) {
                 console.log('saved');
