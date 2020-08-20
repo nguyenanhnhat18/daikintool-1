@@ -1,3 +1,4 @@
+
 (function($) {
     /*==================================================================
     [ Validate ]*/
@@ -21,14 +22,13 @@
         }
         $("#clear").click(()=>{
             dialog('Clear all the process?', 'Caution!', ()=>{                
+                // UpdateModif(true);
                 // daikin_Nexura.checkQuantity();
                 // daikin_Temp.checkQuantity();
                 state = [];
                 mods = 0;
-
                 daikin_Us7.checkQuantity();
-                daikin_OutDoor.checkQuantity(); 
-                  
+                daikin_OutDoor.checkQuantity();   
                 canvas.setBackgroundColor('rgba(255, 255, 255, 255)', canvas.renderAll.bind(canvas));
                 $('#'+dataType).removeClass('is-active');
                 $(".deleteBtn").remove();
@@ -180,30 +180,32 @@
     };
 
 /////////////DOWNLOAD///////////////
-
-let saved = ()=>{
-    $('#c').get(0).toBlob((blob)=>{
-    let name = `Daikin_Design_Quote_${Math.floor(100000 + Math.random() * 900000)}.png`;
-    let quote_id = $('#quote_id').val();
-    saveAs(blob, name);
-    dataURL = $('#c').get(0).toDataURL();
-    $.ajax({
-        type: "POST",
-        
-        url: "APIUploadToFolderAndGeneratePDF.php",
-        data: {
-            base64Img: dataURL,
-            name: name,
-            quote_id: quote_id
-        }
-    }).done(function(o) {
-        
-    });
-})};
-
 let notSaved = ()=>{
     dialog("Download was canceled!", 'Download');
 };
+
+let saveImage = ()=>{$('#c').get(0).toBlob((blob)=>{
+    let name = `Daikin_Design_Quote_${Math.floor(100000 + Math.random() * 900000)}.png`;
+
+    let quote_id = $('#quote_id').val();
+
+    saveAs(blob, name);
+    let dataURL = $('#c').get(0).toDataURL();
+    $.ajax({
+        type: "POST",
+
+        url: "APIUploadToFolderAndGeneratePDF.php",
+        data: { 
+            base64Img: dataURL,
+            name: name,
+            quote_id: quote_id
+
+        }               
+      }).done(function(o) {
+        console.log('saved');
+      });
+})}
+
 $("#save").click(()=>{
     if(canvas.backgroundImage === null){
         dialog(
@@ -214,12 +216,13 @@ $("#save").click(()=>{
     } else {
         canvas.discardActiveObject().renderAll();
         $(".deleteBtn").remove();
-        dialog(`Are you sure save this image on your computer?`, 'Download', saved, notSaved)
+        dialog(`Are you sure save this image on your computer?`, 'Download', saveImage, notSaved)
     }    
 });
 
 /////////////END DOWNLOAD///////////////
 })(jQuery);
+
 
 fabric.Object.prototype.setControlsVisibility({
     tl:true, //top-left
@@ -233,7 +236,9 @@ fabric.Object.prototype.setControlsVisibility({
     mtr:true 
 });
 
-var canvas = new fabric.Canvas('c');
+var canvas = new fabric.Canvas('c', {
+    imageSmoothingEnabled: true
+});
 
 function dialog(message, diagTle = 'Notify', yes = ()=>{}, no = ()=>{}){
     $('.wrapper').css({
@@ -243,7 +248,7 @@ function dialog(message, diagTle = 'Notify', yes = ()=>{}, no = ()=>{}){
         '-ms-filter': 'blur(10px)',
         'filter': 'blur(10px)'});
     $('.message').html(message);
-    let dialog = $('#modal_dialog').dialog({
+    let dialog = $('#modal_dialog').dialog({        
         modal: true,
         buttons: [{           
             text: "YES",
@@ -298,13 +303,14 @@ let UpdateModif = (history)=>{
         canvas.includeDefaultValues = false;
         myJson = canvas.toJSON(['setcontrolsVisibility', "id", "transparentCorners", "centeredScaling"]);
         state.push(myJson);
+        undo_redo_enable(state , mods);  
     }  
     if(check === true && history === true){
         start = (state.length-1-mods-1) ;
         del_num = mods;
         state.splice(start + 1, del_num);
         mods = 0;        
-    } 
+    }
 }
 
 function undo_redo_enable(state, mods){
@@ -357,10 +363,10 @@ class Daikin {
             oImg.set({"centeredScaling" :true});
             
             canvas.add(oImg);
-            UpdateModif(true);
-        }); 
+            UpdateModif(true); 
+        });               
     }
-    
+
     checkQuantity(){
         let curr_obj = 0;
         if(state[state.length - 1 - mods] !== undefined){
@@ -378,7 +384,7 @@ class Daikin {
             this.quantity = this.count
         } 
     }
-    
+
     delete(){
         if(canvas.getActiveObject() && this.id === canvas.getActiveObject().id){
             this._OnDel();
@@ -389,13 +395,11 @@ class Daikin {
     }
 }
 
-//create objects
-// let daikin_Temp = new Daikin(0, 2, "daikin-temp");
-// let daikin_Nexura = new Daikin(0, 2, "daikin-nexura");
 let daikin_Us7 = new Daikin(0, 2, "daikin-us7");
 let daikin_OutDoor = new Daikin(0, 2, "daikin_outdoor");
 
 // add component
+
 // $("#daikin-nexura").click(()=>{            
 //     daikin_Nexura.addImg($("#daikin-nexura")[0]);
 // });
@@ -413,15 +417,18 @@ $("#daikin-option").on('click', '#daikin_outdoor', ()=>{
     daikin_OutDoor.addImg($("#daikin_outdoor")[0]);     
 });
         
+
 //end add component
 
 // add delete button
 $(document).on('click',".deleteBtn",()=>{daikin_Us7.delete()});
+
 // $(document).on('click',".deleteBtn",()=>{daikin_Nexura.delete()});
 // $(document).on('click',".deleteBtn",()=>{daikin_Temp.delete()});
+
 $(document).on('click',".deleteBtn",()=>{daikin_OutDoor.delete()});
 
-//create delete button
+//create delete buttons
 function addDeleteBtn(x, y){
     $(".deleteBtn").remove(); 
     var btnLeft = x-5;
@@ -469,14 +476,14 @@ canvas.on('object:rotating',(e)=>{
     UpdateModif(false)
     $(".deleteBtn").remove(); 
 });
-// end create delete butyon
+// end create delete buttons
 
 //add floor plan function
 
 let img
 let sizeOfcanvasBg;
 
-function setBgImage(ele){    
+function setBgImage(ele){
     img = ele;
     sizeOfcanvasBg = [img.naturalWidth, img.naturalHeight];
     canvas.setDimensions({width : img.naturalWidth, height : img.naturalHeight});
@@ -485,14 +492,13 @@ function setBgImage(ele){
         originX: 'left',
         originY: 'top'
     });
-    //end button zoom in and zoom out function
     // $(".canvas-container")[0].style.margin = "auto";
     // $(".canvas-container")[0].style.top = "10%";
     // UpdateModif(true);
 }
 
 $("#zoomIn").click(()=>{        
-    if(canvas.backgroundImage === null || canvas.backgroundImage === undefined){        
+    if(canvas.backgroundImage === null || canvas.backgroundImage === undefined){
         canvas.clear().renderAll();
     } else {
         sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] * val), Math.round(sizeOfcanvasBg[1] * val)];
@@ -501,6 +507,7 @@ $("#zoomIn").click(()=>{
             scaleX: canvas.width / img.naturalWidth,
             scaleY: canvas.height / img.naturalHeight
         });
+        canvas.renderAll();
         UpdateModif(true);
     }
     for(let i in canvas._objects){
@@ -522,17 +529,18 @@ $("#zoomIn").click(()=>{
 })
 
 $("#zoomOut").click(()=>{
-    if(canvas.backgroundImage === null || canvas.backgroundImage === undefined){        
+    if(canvas.backgroundImage === null || canvas.backgroundImage === undefined){
         canvas.clear().renderAll();
     } else {
-        sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];
+        sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];             
         canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
         canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
             scaleX: canvas.width / img.naturalWidth,
             scaleY: canvas.height / img.naturalHeight
         });
+        canvas.renderAll();
         UpdateModif(true);
-    }
+    }    
     for(let i in canvas._objects){
         let oCoordskey = Object.keys(canvas._objects[i].oCoords);
 
@@ -598,13 +606,13 @@ $('#undoBtn').click(()=>{
         canvas.clear().renderAll();
         canvas.loadFromJSON(state[state.length - 1 - mods - 1]);        
         canvas.renderAll();
-        // console.log("geladen " + (state.length-1-mods-1));
+        console.log("geladen " + (state.length-1-mods-1));
         // console.log("state " + state.length);
         mods += 1;
-        on_undo(true);
-        // console.log("mods " + mods);
+        on_undo(true)
+        console.log("mods " + mods);
     }
-    undo_redo_enable(state, mods);
+    undo_redo_enable(state , mods);
     modifyCanvas();
 }) 
 
@@ -618,7 +626,7 @@ $('#redoBtn').click(()=>{
         // console.log("state " + state.length);
         // console.log("mods " + mods);
     }
-    undo_redo_enable(state, mods);
+    undo_redo_enable(state , mods);
     modifyCanvas();
 })
 ////////END UNDO AND REDO //////////
