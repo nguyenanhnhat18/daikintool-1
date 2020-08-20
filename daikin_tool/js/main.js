@@ -4,12 +4,35 @@
     // Active Control Left
     $('.loading').show();
     $('#editor, #editorControls').addClass('hidden-opacity');
+    
     $('.pane-nav__item').click(function() {
         var dataType = $(this).attr('data-type');
         $('.pane-nav__item').removeClass('is-selected');
         $('.pane-affix').removeClass('is-active');
         $('#'+dataType).addClass('is-active');
         $(this).addClass('is-selected');
+
+        if(canvas.backgroundImage  === null && dataType === 'daikin-option'){
+            $('#'+dataType).removeClass('is-active');
+            $(this).removeClass('is-selected');
+            dialog('This option required your floor plan to continue.', 'Notify',()=>(
+                $('#floor-plan-option').addClass('is-active')
+                ));
+        }
+        $("#clear").click(()=>{
+            dialog('Clear all the process?', 'Caution!', ()=>{
+                $('#'+dataType).removeClass('is-active');
+                $(".deleteBtn").remove();
+                canvas.clear().renderAll();
+                state = [];
+                UpdateModif(true);
+                // daikin_Nexura.checkQuantity();
+                // daikin_Temp.checkQuantity();
+                daikin_Us7.checkQuantity();
+                daikin_OutDoor.checkQuantity();   
+                canvas.setBackgroundColor('rgba(255, 255, 255, 255)', canvas.renderAll.bind(canvas));
+            })            
+        });
     });
     $('.js-pane-affix-close').click(function() {
         $('.pane-affix').removeClass('is-active');
@@ -153,6 +176,43 @@
         }
     };
 
+/////////////DOWNLOAD///////////////
+
+let saved = ()=>{
+    $('#c').get(0).toBlob((blob)=>{
+    let name = `Daikin_Design_Quote_${Math.floor(100000 + Math.random() * 900000)}.png`;
+    saveAs(blob, name);
+    let dataURL = $('#c').get(0).toDataURL();
+    $.ajax({
+        type: "POST",
+        url: "upload.php",
+        data: {
+            base64Img: dataURL,
+            QuoteId: name
+        }
+    }).done(function(o) {
+        
+    });
+})};
+
+let notSaved = ()=>{
+    dialog("Download was canceled!", 'Download');
+};
+$("#save").click(()=>{
+    if(canvas.backgroundImage === null){
+        dialog(
+            'Can not download blank image', 'Download',
+            ()=>($('#floor-plan-option').addClass('is-active')),
+            ()=>($('#floor-plan-option').removeClass('is-active'))
+        )
+    } else {
+        canvas.discardActiveObject().renderAll();
+        $(".deleteBtn").remove();
+        dialog(`Are you sure save this image on your computer?`, 'Download', saved, notSaved)
+    }    
+});
+
+/////////////END DOWNLOAD///////////////
 })(jQuery);
 
 fabric.Object.prototype.setControlsVisibility({
@@ -169,13 +229,42 @@ fabric.Object.prototype.setControlsVisibility({
 
 var canvas = new fabric.Canvas('c');
 
+function dialog(message, diagTle = 'Notify', yes = ()=>{}, no = ()=>{}){
+    $('.wrapper').css({
+        '-webkit-filter': 'blur(10px)',
+        '-moz-filter': 'blur(10px)',
+        '-o-filter': 'blur(10px)',
+        '-ms-filter': 'blur(10px)',
+        'filter': 'blur(10px)'});
+    $('.message').html(message);
+    let dialog = $('#modal_dialog').dialog({
+        modal: true,
+        buttons: [{           
+            text: "YES",
+            click: ()=>{
+                yes()
+                $('.wrapper').removeAttr('style');
+                $('#modal_dialog').dialog( "close" );                
+            }
+        },{
+            text: "NO",
+            click: ()=>{
+                no()
+                $('.wrapper').removeAttr('style');
+                $('#modal_dialog').dialog( "close" );                
+            }
+        }],
+        title: diagTle,
+    });
+}
+
 $("#wrapCanvas").height = window.height;
 $("#wrapCanvas").width = window.width;
 
 $("#wrapCanvas").scroll(()=>{
     canvas.calcOffset();
 });
-canvas.setBackgroundColor('white', canvas.renderAll.bind(canvas))
+canvas.setBackgroundColor('white', canvas.renderAll.bind(canvas));
 
 canvas.counter = 0;
 canvas.selection = false;
@@ -193,7 +282,13 @@ function on_undo(isUndo){
 }
 
 let UpdateModif = (history)=>{
+    let i = 0;
     if(check === true && history === true){
+        while(i < mods){
+            state.pop()
+            i++            
+        }
+        console.log(mods);
         mods = 0;
     } 
     if(history === true){
@@ -227,7 +322,7 @@ class Daikin {
     
     updateQuantity(){
         this.quantity = 0;
-        confirm(`Limited Quantity!\nPlease Delete Components`);
+        dialog(`Limited Quantity!\nPlease Delete Components`);
     }
     
     addImg(e){
@@ -289,21 +384,14 @@ let daikin_OutDoor = new Daikin(0, 2, "daikin_outdoor");
 // $("#daikin-temp").click(()=>{            
 //     daikin_Temp.addImg($("#daikin-temp")[0]);
 // });
-let checkbackground = ()=>{
-    if(canvas.backgroundImage === null){
-        alert("Background please")
-    }
-}
+
 $("#daikin-option").on('click', '#daikin-us7', ()=>{
     // old error code daikin_OutDoor.addImg($("#daikin_outdoor")[0])
-    checkbackground();       
     daikin_Us7.addImg($("#daikin-us7")[0]);
-    
 });
 
-$("#daikin-option").on('click', '#daikin_outdoor', ()=>{ 
-    checkbackground();     
-    daikin_OutDoor.addImg($("#daikin_outdoor")[0])
+$("#daikin-option").on('click', '#daikin_outdoor', ()=>{    
+    daikin_OutDoor.addImg($("#daikin_outdoor")[0]);     
 });
         
 //end add component
@@ -405,6 +493,8 @@ $("#zoomIn").click(()=>{
             canvas._objects[i].oCoords[oCoordskey[j]].y *= val;                
         }
     }
+    canvas.discardActiveObject().renderAll();
+    $(".deleteBtn").remove();
     UpdateModif(true);
 })
 
@@ -428,19 +518,12 @@ $("#zoomOut").click(()=>{
             canvas._objects[i].oCoords[oCoordskey[j]].x /= val;
             canvas._objects[i].oCoords[oCoordskey[j]].y /= val;         
         }
-    }   
+    }
+    canvas.discardActiveObject().renderAll();
+    $(".deleteBtn").remove();
     UpdateModif(true);
 })
 
-$("#clear").click(()=>{
-    canvas.clear().renderAll();
-    UpdateModif(true);
-    // daikin_Nexura.checkQuantity();
-    // daikin_Temp.checkQuantity();
-    daikin_Us7.checkQuantity();
-    daikin_OutDoor.checkQuantity();
-    canvas.setBackgroundColor('rgba(255, 255, 255, 255)', canvas.renderAll.bind(canvas));
-});
 // canvas moving limit   
 canvas.on('object:moving', (e)=>{
     UpdateModif(false);
@@ -476,9 +559,8 @@ let undo = ()=>{
         on_undo(true)
         // console.log("mods " + mods);
     }
-    if(!canvas.getActiveObject()){
-        $(".deleteBtn").remove(); 
-    }
+    canvas.discardActiveObject().renderAll();
+    $(".deleteBtn").remove();     
     // daikin_Nexura.checkQuantity();
     // daikin_Temp.checkQuantity();
     daikin_Us7.checkQuantity();
@@ -486,9 +568,9 @@ let undo = ()=>{
     if(canvas.backgroundImage !== null &&
        state[state.length - 1 - mods].backgroundImage.scaleX !== undefined &&
        state[state.length - 1 - mods].backgroundImage.scaleY !== undefined){
-        let state_width = state[state.length - 1 - mods].backgroundImage.width * state[state.length - 1 - mods].backgroundImage.scaleX;
-        let state_height = state[state.length - 1 - mods].backgroundImage.height * state[state.length - 1 - mods].backgroundImage.scaleY;
-            canvas.setDimensions({width: state_width, height: state_height})
+        let state_wid = state[state.length - 1 - mods].backgroundImage.width * state[state.length - 1 - mods].backgroundImage.scaleX;
+        let state_hei = state[state.length - 1 - mods].backgroundImage.height * state[state.length - 1 - mods].backgroundImage.scaleY;
+        canvas.setDimensions({width: state_wid, height: state_hei});
     }
 }
 
@@ -502,19 +584,19 @@ let redo = ()=>{
         // console.log("state " + state.length);
         // console.log("mods " + mods);
     }
-    if(!canvas.getActiveObject()){
-        $(".deleteBtn").remove(); 
-    }
+    canvas.discardActiveObject().renderAll();
+    $(".deleteBtn").remove();
     // daikin_Nexura.checkQuantity();
     // daikin_Temp.checkQuantity();
     daikin_Us7.checkQuantity();
     daikin_OutDoor.checkQuantity();
-    if(state[state.length - 1 - mods].backgroundImage !== undefined &&
+    if(state.length !== 0 &&
+       state[state.length - 1 - mods].backgroundImage !== undefined &&
        state[state.length - 1 - mods].backgroundImage.scaleX !== undefined &&
        state[state.length - 1 - mods].backgroundImage.scaleY !== undefined){
-           let state_width = state[state.length - 1 - mods].backgroundImage.width * state[state.length - 1 - mods].backgroundImage.scaleX;
-           let state_height = state[state.length - 1 - mods].backgroundImage.height * state[state.length - 1 - mods].backgroundImage.scaleY;
-           canvas.setDimensions({width: state_width, height: state_height})
+           let state_wid = state[state.length - 1 - mods].backgroundImage.width * state[state.length - 1 - mods].backgroundImage.scaleX;
+           let state_hei = state[state.length - 1 - mods].backgroundImage.height * state[state.length - 1 - mods].backgroundImage.scaleY;
+           canvas.setDimensions({width: state_wid, height: state_hei});
         }
     }
 ////////END UNDO AND REDO //////////
