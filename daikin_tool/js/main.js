@@ -287,9 +287,6 @@ canvas.selection = false;
 let state = [];
 let mods = 0;
 
-let val = 1;
-val = (val*10 +  0.01*10)/10;
-
 let check;
 function on_undo(isUndo){
     if(isUndo === true){
@@ -363,10 +360,12 @@ class Daikin {
             oImg.set({'top':t});
             oImg.set({"transparentCorners" :false});
             oImg.set({"centeredScaling" :true});
-            
+            oImg.sendToBack();
             canvas.add(oImg);
-            UpdateModif(true); 
-        });               
+
+            UpdateModif(true);
+            
+        });   
     }
 
     checkQuantity(){
@@ -413,9 +412,11 @@ let daikin_OutDoor = new Daikin(0, 2, "daikin_outdoor");
 $("#daikin-option").on('click', '#daikin-us7', ()=>{
     // old error code daikin_OutDoor.addImg($("#daikin_outdoor")[0])
     daikin_Us7.addImg($("#daikin-us7")[0]);
+    daikin_OutDoor.addImg($("#daikin_outdoor")[0]);
 });
 
-$("#daikin-option").on('click', '#daikin_outdoor', ()=>{    
+$("#daikin-option").on('click', '#daikin_outdoor', ()=>{  
+    daikin_Us7.addImg($("#daikin-us7")[0]);  
     daikin_OutDoor.addImg($("#daikin_outdoor")[0]);     
 });
         
@@ -433,20 +434,22 @@ $(document).on('click',".deleteBtn",()=>{daikin_OutDoor.delete()});
 //create delete buttons
 function addDeleteBtn(x, y){
     $(".deleteBtn").remove(); 
-    var btnLeft = x-5;
+    var btnLeft = x - 10;
     var btnTop = y-20;
     var deleteBtn = '<img src="icon/close-img.png" class="deleteBtn" style="position:absolute;top:'+btnTop+'px;left:'+btnLeft+'px;cursor:pointer;width:20px;height:20px;"/>';
     $(".canvas-container").append(deleteBtn);
 };
 
 canvas.on('object:selected',(e)=>{
-    UpdateModif(false)
+    UpdateModif(false);
     addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);
+    cur_angle = e.target.angle;
 });
 
 canvas.on('mouse:down',(e)=>{
     UpdateModif(false)
     if(canvas.getActiveObject()){
+        cur_angle = e.target.angle;
         addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);
         UpdateModif(false)
     }
@@ -499,6 +502,9 @@ function setBgImage(ele){
     // UpdateModif(true);
 }
 
+let val = 1;
+val = (val*10 +  0.01*10)/10;
+
 $("#zoomIn").click(()=>{        
     if(canvas.backgroundImage === null || canvas.backgroundImage === undefined){
         canvas.clear().renderAll();
@@ -513,7 +519,7 @@ $("#zoomIn").click(()=>{
         UpdateModif(true);
     }
     for(let i in canvas._objects){
-        let oCoordskey = Object.keys(canvas._objects[i].oCoords);
+        // let oCoordskey = Object.keys(canvas._objects[i].oCoords);
         
         canvas._objects[i].left *= val;
         canvas._objects[i].top *= val;
@@ -521,10 +527,7 @@ $("#zoomIn").click(()=>{
         canvas._objects[i].translateX *= val;
         canvas._objects[i].translateY *= val;
         
-        for(let j in oCoordskey){
-            canvas._objects[i].oCoords[oCoordskey[j]].x *= val;
-            canvas._objects[i].oCoords[oCoordskey[j]].y *= val;                
-        }
+        canvas.item(i).setCoords();
     }
     canvas.discardActiveObject().renderAll();
     $(".deleteBtn").remove();
@@ -544,22 +547,90 @@ $("#zoomOut").click(()=>{
         UpdateModif(true);
     }    
     for(let i in canvas._objects){
-        let oCoordskey = Object.keys(canvas._objects[i].oCoords);
+        // let oCoordskey = Object.keys(canvas._objects[i].oCoords);
 
         canvas._objects[i].left /= val;
         canvas._objects[i].top /= val;
 
         canvas._objects[i].translateX /= val;
         canvas._objects[i].translateY /= val;
-
-        for(let j in oCoordskey){                
-            canvas._objects[i].oCoords[oCoordskey[j]].x /= val;
-            canvas._objects[i].oCoords[oCoordskey[j]].y /= val;         
-        }
+        canvas.item(i).setCoords();
     }
     canvas.discardActiveObject().renderAll();
     $(".deleteBtn").remove();
 })
+
+//Rotate Objects Function
+let deg = 0;
+let cur_angle;
+$('#rot_lef').click((e)=>{   
+    cur_angle -= 15;
+    deg = cur_angle;
+    if(canvas.getActiveObject() !== null){
+        canvas.getActiveObject().set({'angle': deg});
+        canvas.getActiveObject().setCoords();
+    }
+    // for(let i in canvas._objects){
+    //     canvas.item(i).set({'angle': deg});
+    //     canvas.item(i).setCoords();
+    canvas.renderAll();
+    // }
+    // canvas.discardActiveObject().renderAll();)
+    UpdateModif(true);
+    $(".deleteBtn").remove();
+})
+
+$('#rot_rig').click((e)=>{
+    cur_angle += 15;
+    deg = cur_angle;    
+    if(canvas.getActiveObject() !== null){
+        canvas.getActiveObject().set({'angle': deg});
+        canvas.getActiveObject().setCoords();
+    }
+    // for(let i in canvas._objects){
+    //     canvas.item(i).set({'angle': deg});
+    //     canvas.item(i).setCoords();
+    canvas.renderAll();
+    // }
+    // canvas.discardActiveObject().renderAll();
+    UpdateModif(true);
+    $(".deleteBtn").remove();
+})
+$('#rot_90_lef').click((e)=>{    
+    cur_angle -= 90;
+    deg = cur_angle;
+    if(canvas.getActiveObject() !== null){
+        canvas.getActiveObject().set({'angle': deg});
+        canvas.getActiveObject().setCoords();
+    }
+    // for(let i in canvas._objects){
+    //     canvas.item(i).set({'angle': deg});
+    //     canvas.item(i).setCoords();
+    canvas.renderAll();
+    // }
+    // canvas.discardActiveObject().renderAll();
+    UpdateModif(true);
+    $(".deleteBtn").remove();
+})
+
+$('#rot_90_rig').click((e)=>{    
+    cur_angle += 90;
+    deg = cur_angle;
+    if(canvas.getActiveObject() !== null){
+        canvas.getActiveObject().set({'angle': deg});
+        canvas.getActiveObject().setCoords();
+    }
+    // for(let i in canvas._objects){
+    //     canvas.item(i).set({'angle': deg});
+    //     canvas.item(i).setCoords();
+    canvas.renderAll();
+    // }
+    // canvas.discardActiveObject().renderAll();
+    UpdateModif(true);
+    $(".deleteBtn").remove();
+})
+
+//End rotate object function
 
 // canvas moving limit   
 canvas.on('object:moving', (e)=>{
@@ -608,11 +679,11 @@ $('#undoBtn').click(()=>{
         canvas.clear().renderAll();
         canvas.loadFromJSON(state[state.length - 1 - mods - 1]);        
         canvas.renderAll();
-        console.log("geladen " + (state.length-1-mods-1));
+        // console.log("geladen " + (state.length-1-mods-1));
         // console.log("state " + state.length);
         mods += 1;
         on_undo(true)
-        console.log("mods " + mods);
+        // console.log("mods " + mods);
     }
     undo_redo_enable(state , mods);
     modifyCanvas();
