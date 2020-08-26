@@ -1,3 +1,4 @@
+
 (function($) {
     /*==================================================================
     [ Validate ]*/
@@ -20,17 +21,20 @@
                 ));
         }
         $("#clear").click(()=>{
-            dialog('Clear all the process?', 'Caution!', ()=>{
-                $('#'+dataType).removeClass('is-active');
-                $(".deleteBtn").remove();
-                canvas.clear().renderAll();
-                state = [];
-                UpdateModif(true);
+            dialog('Clear all the process?', 'Caution!', ()=>{                
+                // UpdateModif(true);
                 // daikin_Nexura.checkQuantity();
                 // daikin_Temp.checkQuantity();
+                state = [];
+                mods = 0;
                 daikin_Us7.checkQuantity();
                 daikin_OutDoor.checkQuantity();   
                 canvas.setBackgroundColor('rgba(255, 255, 255, 255)', canvas.renderAll.bind(canvas));
+                $('#'+dataType).removeClass('is-active');
+                $(".deleteBtn").remove();
+                canvas.clear().renderAll();
+                check = false;
+                undo_redo_enable(state , mods);                                
             })            
         });
     });
@@ -204,6 +208,9 @@
     };
 
 /////////////DOWNLOAD///////////////
+let notSaved = ()=>{
+    dialog("Download was canceled!", 'Download');
+};
 
 let saved = () => {
     $('#c').get(0).toBlob((blob) => {
@@ -226,9 +233,6 @@ let saved = () => {
     })
 };
 
-let notSaved = ()=>{
-    dialog("Download was canceled!", 'Download');
-};
 $("#save").click(()=>{
     if(canvas.backgroundImage === null){
         dialog(
@@ -239,12 +243,13 @@ $("#save").click(()=>{
     } else {
         canvas.discardActiveObject().renderAll();
         $(".deleteBtn").remove();
-        dialog(`Are you sure save this image on your computer?`, 'Download', saved, notSaved)
+        dialog(`Are you sure save this image on your computer?`, 'Download', saveImage, notSaved)
     }    
 });
 
 /////////////END DOWNLOAD///////////////
 })(jQuery);
+
 
 fabric.Object.prototype.setControlsVisibility({
     tl:true, //top-left
@@ -258,7 +263,9 @@ fabric.Object.prototype.setControlsVisibility({
     mtr:true 
 });
 
-var canvas = new fabric.Canvas('c');
+var canvas = new fabric.Canvas('c', {
+    imageSmoothingEnabled: true
+});
 
 function dialog(message, diagTle = 'Notify', yes = ()=>{}, no = ()=>{}){
     $('.wrapper').css({
@@ -268,7 +275,7 @@ function dialog(message, diagTle = 'Notify', yes = ()=>{}, no = ()=>{}){
         '-ms-filter': 'blur(10px)',
         'filter': 'blur(10px)'});
     $('.message').html(message);
-    let dialog = $('#modal_dialog').dialog({
+    let dialog = $('#modal_dialog').dialog({        
         modal: true,
         buttons: [{           
             text: "YES",
@@ -286,6 +293,10 @@ function dialog(message, diagTle = 'Notify', yes = ()=>{}, no = ()=>{}){
             }
         }],
         title: diagTle,
+        close: function(){
+            $('.wrapper').removeAttr('style');
+            $('#modal_dialog').dialog( "close" );    
+        }
     });
 }
 
@@ -302,31 +313,36 @@ canvas.selection = false;
 let state = [];
 let mods = 0;
 
-let val = 1;
-val = (val*10 +  0.01*10)/10;
-
-check = false;
+let check;
 function on_undo(isUndo){
     if(isUndo === true){
         return check = true;
+    } else {
+        return check = false;
     }
 }
 
 let UpdateModif = (history)=>{
-    let i = 0;
-    if(check === true && history === true){
-        while(i < mods){
-            state.pop()
-            i++            
-        }
-        console.log(mods);
-        mods = 0;
-    } 
     if(history === true){
         canvas.includeDefaultValues = false;
         myJson = canvas.toJSON(['setcontrolsVisibility', "id", "transparentCorners", "centeredScaling"]);
         state.push(myJson);
+        undo_redo_enable(state , mods);  
+    }  
+    if(check === true && history === true){
+        start = (state.length-1-mods-1) ;
+        del_num = mods;
+        state.splice(start + 1, del_num);
+        mods = 0;
+        undo_redo_enable(state , mods);        
     }
+}
+
+function undo_redo_enable(state, mods){
+    let geladen = state.length-1-mods-1;
+    state.length > 0 ? $('.b-header__undo').removeClass('is-disabled') : $('.b-header__undo').addClass('is-disabled');
+    geladen < 0 ? $('.b-header__undo').addClass('is-disabled') : $('.b-header__undo').removeClass('is-disabled');
+    mods > 0 ? $('.b-header__redo').removeClass('is-disabled') : $('.b-header__redo').addClass('is-disabled');
 }
 
 class Daikin {
@@ -370,27 +386,32 @@ class Daikin {
             oImg.set({'top':t});
             oImg.set({"transparentCorners" :false});
             oImg.set({"centeredScaling" :true});
-            
+            oImg.sendToBack();
             canvas.add(oImg);
-        });
-        UpdateModif(true);        
+
+            UpdateModif(true);
+            
+        });   
     }
 
     checkQuantity(){
-        let curr_obj = 0;        
+        let curr_obj = 0;
         if(state[state.length - 1 - mods] !== undefined){
-        let current_State = state[state.length - 1 - mods].objects;
-        if(current_State.length > 0){
-            for(let x in current_State){
-                if(this.id === current_State[x].id){
-                    curr_obj++
+            let current_State = state[state.length - 1 - mods].objects;
+            if(current_State.length > 0){
+                for(let x in current_State){
+                    if(this.id === current_State[x].id){
+                        curr_obj++
+                    }
                 }
+                this.quantity = curr_obj;
+                this.quantity = this.count - this.quantity;
             }
-        }
-        this.quantity = curr_obj;
-        this.quantity = this.count - this.quantity;
+        } else {
+            this.quantity = this.count
+        } 
     }
-}
+
     delete(){
         if(canvas.getActiveObject() && this.id === canvas.getActiveObject().id){
             this._OnDel();
@@ -401,13 +422,11 @@ class Daikin {
     }
 }
 
-//create objects
-// let daikin_Temp = new Daikin(0, 2, "daikin-temp");
-// let daikin_Nexura = new Daikin(0, 2, "daikin-nexura");
 let daikin_Us7 = new Daikin(0, 2, "daikin-us7");
 let daikin_OutDoor = new Daikin(0, 2, "daikin_outdoor");
 
 // add component
+
 // $("#daikin-nexura").click(()=>{            
 //     daikin_Nexura.addImg($("#daikin-nexura")[0]);
 // });
@@ -419,37 +438,44 @@ let daikin_OutDoor = new Daikin(0, 2, "daikin_outdoor");
 $("#daikin-option").on('click', '#daikin-us7', ()=>{
     // old error code daikin_OutDoor.addImg($("#daikin_outdoor")[0])
     daikin_Us7.addImg($("#daikin-us7")[0]);
+    daikin_OutDoor.addImg($("#daikin_outdoor")[0]);
 });
 
-$("#daikin-option").on('click', '#daikin_outdoor', ()=>{    
+$("#daikin-option").on('click', '#daikin_outdoor', ()=>{  
+    daikin_Us7.addImg($("#daikin-us7")[0]);  
     daikin_OutDoor.addImg($("#daikin_outdoor")[0]);     
 });
         
+
 //end add component
 
 // add delete button
 $(document).on('click',".deleteBtn",()=>{daikin_Us7.delete()});
+
 // $(document).on('click',".deleteBtn",()=>{daikin_Nexura.delete()});
 // $(document).on('click',".deleteBtn",()=>{daikin_Temp.delete()});
+
 $(document).on('click',".deleteBtn",()=>{daikin_OutDoor.delete()});
 
-//create delete button
+//create delete buttons
 function addDeleteBtn(x, y){
     $(".deleteBtn").remove(); 
-    var btnLeft = x-5;
+    var btnLeft = x - 10;
     var btnTop = y-20;
     var deleteBtn = '<img src="icon/close-img.png" class="deleteBtn" style="position:absolute;top:'+btnTop+'px;left:'+btnLeft+'px;cursor:pointer;width:20px;height:20px;"/>';
     $(".canvas-container").append(deleteBtn);
 };
 
 canvas.on('object:selected',(e)=>{
-    UpdateModif(false)
+    UpdateModif(false);
     addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);
+    cur_angle = e.target.angle;
 });
 
 canvas.on('mouse:down',(e)=>{
     UpdateModif(false)
     if(canvas.getActiveObject()){
+        cur_angle = e.target.angle;
         addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);
         UpdateModif(false)
     }
@@ -481,14 +507,14 @@ canvas.on('object:rotating',(e)=>{
     UpdateModif(false)
     $(".deleteBtn").remove(); 
 });
-// end create delete butyon
+// end create delete buttons
 
 //add floor plan function
 
 let img
 let sizeOfcanvasBg;
 
-function setBgImage(ele){    
+function setBgImage(ele){
     img = ele;
     sizeOfcanvasBg = [img.naturalWidth, img.naturalHeight];
     canvas.setDimensions({width : img.naturalWidth, height : img.naturalHeight});
@@ -497,21 +523,29 @@ function setBgImage(ele){
         originX: 'left',
         originY: 'top'
     });
-    //end button zoom in and zoom out function
     // $(".canvas-container")[0].style.margin = "auto";
     // $(".canvas-container")[0].style.top = "10%";
-    UpdateModif(true);
+    // UpdateModif(true);
 }
 
+let val = 1;
+val = (val*10 +  0.01*10)/10;
+
 $("#zoomIn").click(()=>{        
-    sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] * val), Math.round(sizeOfcanvasBg[1] * val)];
-    canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
-    canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
-        scaleX: canvas.width / img.naturalWidth,
-        scaleY: canvas.height / img.naturalHeight
-    });
+    if(canvas.backgroundImage === null || canvas.backgroundImage === undefined){
+        canvas.clear().renderAll();
+    } else {
+        sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] * val), Math.round(sizeOfcanvasBg[1] * val)];
+        canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
+        canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
+            scaleX: canvas.width / img.naturalWidth,
+            scaleY: canvas.height / img.naturalHeight
+        });
+        canvas.renderAll();
+        UpdateModif(true);
+    }
     for(let i in canvas._objects){
-        let oCoordskey = Object.keys(canvas._objects[i].oCoords);
+        // let oCoordskey = Object.keys(canvas._objects[i].oCoords);
         
         canvas._objects[i].left *= val;
         canvas._objects[i].top *= val;
@@ -519,41 +553,110 @@ $("#zoomIn").click(()=>{
         canvas._objects[i].translateX *= val;
         canvas._objects[i].translateY *= val;
         
-        for(let j in oCoordskey){
-            canvas._objects[i].oCoords[oCoordskey[j]].x *= val;
-            canvas._objects[i].oCoords[oCoordskey[j]].y *= val;                
-        }
+        canvas.item(i).setCoords();
     }
     canvas.discardActiveObject().renderAll();
     $(".deleteBtn").remove();
-    UpdateModif(true);
 })
 
 $("#zoomOut").click(()=>{
-    sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];              
-    canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
-    canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
-        scaleX: canvas.width / img.naturalWidth,
-        scaleY: canvas.height / img.naturalHeight
-    });     
+    if(canvas.backgroundImage === null || canvas.backgroundImage === undefined){
+        canvas.clear().renderAll();
+    } else {
+        sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];             
+        canvas.setDimensions({width : sizeOfcanvasBg[0], height : sizeOfcanvasBg[1]});
+        canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
+            scaleX: canvas.width / img.naturalWidth,
+            scaleY: canvas.height / img.naturalHeight
+        });
+        canvas.renderAll();
+        UpdateModif(true);
+    }    
     for(let i in canvas._objects){
-        let oCoordskey = Object.keys(canvas._objects[i].oCoords);
+        // let oCoordskey = Object.keys(canvas._objects[i].oCoords);
 
         canvas._objects[i].left /= val;
         canvas._objects[i].top /= val;
 
         canvas._objects[i].translateX /= val;
         canvas._objects[i].translateY /= val;
-
-        for(let j in oCoordskey){                
-            canvas._objects[i].oCoords[oCoordskey[j]].x /= val;
-            canvas._objects[i].oCoords[oCoordskey[j]].y /= val;         
-        }
+        canvas.item(i).setCoords();
     }
     canvas.discardActiveObject().renderAll();
     $(".deleteBtn").remove();
-    UpdateModif(true);
 })
+
+//Rotate Objects Function
+let deg = 0;
+let cur_angle;
+$('#rot_lef').click((e)=>{   
+    cur_angle -= 15;
+    deg = cur_angle;
+    if(canvas.getActiveObject() !== null){
+        canvas.getActiveObject().set({'angle': deg});
+        canvas.getActiveObject().setCoords();
+    }
+    // for(let i in canvas._objects){
+    //     canvas.item(i).set({'angle': deg});
+    //     canvas.item(i).setCoords();
+    canvas.renderAll();
+    // }
+    // canvas.discardActiveObject().renderAll();)
+    UpdateModif(true);
+    $(".deleteBtn").remove();
+})
+
+$('#rot_rig').click((e)=>{
+    cur_angle += 15;
+    deg = cur_angle;    
+    if(canvas.getActiveObject() !== null){
+        canvas.getActiveObject().set({'angle': deg});
+        canvas.getActiveObject().setCoords();
+    }
+    // for(let i in canvas._objects){
+    //     canvas.item(i).set({'angle': deg});
+    //     canvas.item(i).setCoords();
+    canvas.renderAll();
+    // }
+    // canvas.discardActiveObject().renderAll();
+    UpdateModif(true);
+    $(".deleteBtn").remove();
+})
+$('#rot_90_lef').click((e)=>{    
+    cur_angle -= 90;
+    deg = cur_angle;
+    if(canvas.getActiveObject() !== null){
+        canvas.getActiveObject().set({'angle': deg});
+        canvas.getActiveObject().setCoords();
+    }
+    // for(let i in canvas._objects){
+    //     canvas.item(i).set({'angle': deg});
+    //     canvas.item(i).setCoords();
+    canvas.renderAll();
+    // }
+    // canvas.discardActiveObject().renderAll();
+    UpdateModif(true);
+    $(".deleteBtn").remove();
+})
+
+$('#rot_90_rig').click((e)=>{    
+    cur_angle += 90;
+    deg = cur_angle;
+    if(canvas.getActiveObject() !== null){
+        canvas.getActiveObject().set({'angle': deg});
+        canvas.getActiveObject().setCoords();
+    }
+    // for(let i in canvas._objects){
+    //     canvas.item(i).set({'angle': deg});
+    //     canvas.item(i).setCoords();
+    canvas.renderAll();
+    // }
+    // canvas.discardActiveObject().renderAll();
+    UpdateModif(true);
+    $(".deleteBtn").remove();
+})
+
+//End rotate object function
 
 // canvas moving limit   
 canvas.on('object:moving', (e)=>{
@@ -578,8 +681,26 @@ canvas.on('object:moving', (e)=>{
 // end canvas moving limit
 
 /*////// UNDO  & REDO //////*/
+function modifyCanvas(){
+    $('#daikin-option').removeClass('is-active');
+    canvas.discardActiveObject().renderAll();
+    $(".deleteBtn").remove();     
+    // daikin_Nexura.checkQuantity();
+    // daikin_Temp.checkQuantity();
+    daikin_Us7.checkQuantity();
+    daikin_OutDoor.checkQuantity();
+    if(state.length - 1 - mods >= 0){
+        if(state[state.length - 1 - mods].backgroundImage !== undefined &&
+           state[state.length - 1 - mods].backgroundImage.scaleX !== undefined &&
+           state[state.length - 1 - mods].backgroundImage.scaleY !== undefined){
+            let state_wid = state[state.length - 1 - mods].backgroundImage.width * state[state.length - 1 - mods].backgroundImage.scaleX;
+            let state_hei = state[state.length - 1 - mods].backgroundImage.height * state[state.length - 1 - mods].backgroundImage.scaleY;
+            canvas.setDimensions({width: state_wid, height: state_hei});
+           }
+    }
+}
 
-let undo = ()=>{
+$('#undoBtn').click(()=>{
     if (mods < state.length) {
         canvas.clear().renderAll();
         canvas.loadFromJSON(state[state.length - 1 - mods - 1]);        
@@ -590,22 +711,11 @@ let undo = ()=>{
         on_undo(true)
         // console.log("mods " + mods);
     }
-    canvas.discardActiveObject().renderAll();
-    $(".deleteBtn").remove();     
-    // daikin_Nexura.checkQuantity();
-    // daikin_Temp.checkQuantity();
-    daikin_Us7.checkQuantity();
-    daikin_OutDoor.checkQuantity();
-    if(canvas.backgroundImage !== null &&
-       state[state.length - 1 - mods].backgroundImage.scaleX !== undefined &&
-       state[state.length - 1 - mods].backgroundImage.scaleY !== undefined){
-        let state_wid = state[state.length - 1 - mods].backgroundImage.width * state[state.length - 1 - mods].backgroundImage.scaleX;
-        let state_hei = state[state.length - 1 - mods].backgroundImage.height * state[state.length - 1 - mods].backgroundImage.scaleY;
-        canvas.setDimensions({width: state_wid, height: state_hei});
-    }
-}
+    undo_redo_enable(state , mods);
+    modifyCanvas();
+}) 
 
-let redo = ()=>{
+$('#redoBtn').click(()=>{
     if (mods > 0) {
         canvas.clear().renderAll();
         canvas.loadFromJSON(state[state.length - 1 - mods + 1]);
@@ -615,21 +725,9 @@ let redo = ()=>{
         // console.log("state " + state.length);
         // console.log("mods " + mods);
     }
-    canvas.discardActiveObject().renderAll();
-    $(".deleteBtn").remove();
-    // daikin_Nexura.checkQuantity();
-    // daikin_Temp.checkQuantity();
-    daikin_Us7.checkQuantity();
-    daikin_OutDoor.checkQuantity();
-    if(state.length !== 0 &&
-       state[state.length - 1 - mods].backgroundImage !== undefined &&
-       state[state.length - 1 - mods].backgroundImage.scaleX !== undefined &&
-       state[state.length - 1 - mods].backgroundImage.scaleY !== undefined){
-           let state_wid = state[state.length - 1 - mods].backgroundImage.width * state[state.length - 1 - mods].backgroundImage.scaleX;
-           let state_hei = state[state.length - 1 - mods].backgroundImage.height * state[state.length - 1 - mods].backgroundImage.scaleY;
-           canvas.setDimensions({width: state_wid, height: state_hei});
-        }
-    }
+    undo_redo_enable(state , mods);
+    modifyCanvas();
+})
 ////////END UNDO AND REDO //////////
 
 function renderIcon(icon) {
