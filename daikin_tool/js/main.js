@@ -68,83 +68,110 @@
     var url = new URL(url_string);
     var quote_id = url.searchParams.get("quote_id");
 
-    $.ajax({
-        url: "APIGetDaikinOption.php",
-        data: {
-            'quote_id': quote_id,
-        },
-        type: 'POST',
-        success: function(data)
-        {
-            var res = jQuery.parseJSON(data);
-            $('#pre_install_photos_c').val(res['pre_install_photos_c']);
-            $('#quote_id').val(res['quote_id']);
-            var keys = Object.keys(res['products']);
-            for(var i = 0; i < keys.length; i++) {
-                if((keys[i].indexOf('FTX') != -1) || (keys[i].indexOf('FVX') != -1)) {
-                    var wrapperItem = $('#daikinItems');
-                    var itemDaikin = '<div class="pane-affix__catalog-column is-2">\
-                                        <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
-                                            <div class="item-texture__image">\
-                                                <img src="icon/daikin-us7.jpg" id="daikin-us7" alt="">\
-                                            </div>\
-                                        </a>\
-                                        <span><strong>'+res['products'][keys[i]]['Product']+'('+res['products'][keys[i]]['Quantity']+'X)</strong></span>\
-                                    </div>';
-                    var itemDaikinOutdoor = '<div class="pane-affix__catalog-column is-2">\
-                                        <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
-                                            <div class="item-texture__image">\
-                                                <img src="icon/daikin_outdoor.png" id="daikin_outdoor" alt="">\
-                                            </div>\
-                                        </a>\
-                                        <span><strong>'+res['products'][keys[i]]['Product']+'-Outdoor ('+res['products'][keys[i]]['Quantity']+'X)</strong></span>\
-                                    </div>';
-                    wrapperItem.append(itemDaikin);
-                    wrapperItem.append(itemDaikinOutdoor);
-                }
-            }
-            downloadFloorPlanFromSuite(res['quote_id'], res['pre_install_photos_c']);
-            
-        },
-        error: function(response){console.log("Fail");},
-    });
-
-    function downloadFloorPlanFromSuite(quote_id, pre_install_photos_c,  callback){
-        $('.loading').find('h3').text('Preparring Floor Plan');
+    if(quote_id != null) {
         $.ajax({
-            url: "APIGetPlanFloorFromSuite.php",
+            url: "APIGetDaikinOption.php",
             data: {
                 'quote_id': quote_id,
-                'pre_install_photos_c': pre_install_photos_c
             },
             type: 'POST',
             success: function(data)
             {
-                if(data != 'fail') {
-                    var res = jQuery.parseJSON(data);
-                    for(var i = 0; i < res.length; i++) {
-                        var wrapperItemFloor = $('#FloorItems');
-                        var itemFloor = '<div class="pane-affix__catalog-column is-2">\
+                var res = jQuery.parseJSON(data);
+                $('#pre_install_photos_c').val(res['pre_install_photos_c']);
+                $('#quote_id').val(res['quote_id']);
+                var keys = Object.keys(res['products']);
+                for(var i = 0; i < keys.length; i++) {
+                    if((keys[i].indexOf('FTX') != -1) || (keys[i].indexOf('FVX') != -1)) {
+                        var wrapperItem = $('#daikinItems');
+                        var itemDaikin = '<div class="pane-affix__catalog-column is-2">\
                                             <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
                                                 <div class="item-texture__image">\
-                                                    <img src="'+res[i]+'" onclick="setBgImage(this)" alt="">\
+                                                    <img src="icon/daikin-us7.jpg" id="daikin-us7" alt="">\
                                                 </div>\
                                             </a>\
+                                            <span><strong>'+res['products'][keys[i]]['Product']+'('+res['products'][keys[i]]['Quantity']+'X)</strong></span>\
                                         </div>';
-                                        wrapperItemFloor.append(itemFloor);
-                        $('.loading').hide();
-                        $('#editor, #editorControls').removeClass('hidden-opacity');
+                        var itemDaikinOutdoor = '<div class="pane-affix__catalog-column is-2">\
+                                            <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
+                                                <div class="item-texture__image">\
+                                                    <img src="icon/daikin_outdoor.png" id="daikin_outdoor" alt="">\
+                                                </div>\
+                                            </a>\
+                                            <span><strong>'+res['products'][keys[i]]['Product']+'-Outdoor ('+res['products'][keys[i]]['Quantity']+'X)</strong></span>\
+                                        </div>';
+                        wrapperItem.append(itemDaikin);
+                        wrapperItem.append(itemDaikinOutdoor);
                     }
-                } else {
-                    alert("Can't get photo of Floor Plan, Please upload photo by your device");
-                    $('.loading').hide();
-                    $('#editor, #editorControls').removeClass('hidden-opacity');
                 }
-                
+                downloadFloorPlanFromSuite(res['quote_id'], res['pre_install_photos_c']);
                 
             },
             error: function(response){console.log("Fail");},
         });
+    
+        function downloadFloorPlanFromSuite(quote_id, pre_install_photos_c,  callback){
+            $('.loading').find('h3').text('Preparring Floor Plan');
+            $.ajax({
+                url: "APIGetPlanFloorFromSuite.php",
+                data: {
+                    'quote_id': quote_id,
+                    'pre_install_photos_c': pre_install_photos_c
+                },
+                type: 'POST',
+                success: function(data)
+                {
+                    if(data != 'fail') {
+                        var res = jQuery.parseJSON(data);
+                        for(var i = 0; i < res.length; i++) {
+                            var wrapperItemFloor = $('#FloorItems');
+                            var itemFloor = '<div class="pane-affix__catalog-column is-2">\
+                                                <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
+                                                    <div class="item-texture__image">\
+                                                        <img src="'+res[i]+'" onclick="setBgImage(this)" alt="">\
+                                                    </div>\
+                                                </a>\
+                                            </div>';
+                                            wrapperItemFloor.append(itemFloor);
+                            $('.loading').hide();
+                            $('#editor, #editorControls').removeClass('hidden-opacity');
+                        }
+                    } else {
+                        dialog("Can't get photo of Floor Plan, Please upload photo by your device", 'Notify');
+                        $('.loading').hide();
+                        $('#editor, #editorControls').removeClass('hidden-opacity');
+                    }
+                    
+                    
+                },
+                error: function(response){console.log("Fail");},
+            });
+        }
+    } else {
+        dialog("Please upload Floor Plan", 'Notify');
+        $('.loading').hide();
+        $('#editor, #editorControls').removeClass('hidden-opacity');
+        for(var i = 0; i < 1; i++) {
+            var wrapperItem = $('#daikinItems');
+            var itemDaikin = '<div class="pane-affix__catalog-column is-2">\
+                                <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
+                                    <div class="item-texture__image">\
+                                        <img src="icon/daikin-us7.jpg" id="daikin-us7" alt="">\
+                                    </div>\
+                                </a>\
+                                <span><strong>Daikin indoor(10X)</strong></span>\
+                            </div>';
+            var itemDaikinOutdoor = '<div class="pane-affix__catalog-column is-2">\
+                                <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
+                                    <div class="item-texture__image">\
+                                        <img src="icon/daikin_outdoor.png" id="daikin_outdoor" alt="">\
+                                    </div>\
+                                </a>\
+                                <span><strong>Daikin outdoor(10X)</strong></span>\
+                            </div>';
+            wrapperItem.append(itemDaikin);
+            wrapperItem.append(itemDaikinOutdoor);
+        }
     }
 
     var canvasWrap = document.getElementById('c');
@@ -178,22 +205,26 @@
 
 /////////////DOWNLOAD///////////////
 
-let saved = ()=>{
-    $('#c').get(0).toBlob((blob)=>{
-    let name = `Daikin_Design_Quote_${Math.floor(100000 + Math.random() * 900000)}.png`;
-    saveAs(blob, name);
-    let dataURL = $('#c').get(0).toDataURL();
-    $.ajax({
-        type: "POST",
-        url: "upload.php",
-        data: {
-            base64Img: dataURL,
-            QuoteId: name
-        }
-    }).done(function(o) {
-        
-    });
-})};
+let saved = () => {
+    $('#c').get(0).toBlob((blob) => {
+        let name = `Daikin_Design_Quote_${Math.floor(100000 + Math.random() * 900000)}.png`;
+        let quote_id = $('#quote_id').val();
+        saveAs(blob, name);
+        let dataURL = $('#c').get(0).toDataURL();
+        $.ajax({
+            type: "POST",
+            url: "APIUploadToFolderAndGeneratePDF.php",
+            data: { 
+                base64Img: dataURL,
+                name: name,
+                quote_id: quote_id
+            }               
+            }).done(function(o) {
+                console.log('saved');
+            }
+        );
+    })
+};
 
 let notSaved = ()=>{
     dialog("Download was canceled!", 'Download');
@@ -601,34 +632,6 @@ let redo = ()=>{
     }
 ////////END UNDO AND REDO //////////
 
-/////////////DOWNLOAD///////////////
-
-$("#save").click(()=>{
-    if(canvas.getActiveObject()){
-        confirm("Please unselect components to continue!")
-    } else {
-        confirm("Are you sure save this image on your computer?") ?
-        $('#c').get(0).toBlob((blob)=>{
-            let name = `Daikin_Design_Quote_${Math.floor(100000 + Math.random() * 900000)}.png`;
-            let quote_id = $('#quote_id').val();
-            saveAs(blob, name);
-            let dataURL = $('#c').get(0).toDataURL();
-            $.ajax({
-                type: "POST",
-                url: "APIUploadToFolderAndGeneratePDF.php",
-                data: { 
-                    base64Img: dataURL,
-                    name: name,
-                    quote_id: quote_id
-                }               
-              }).done(function(o) {
-                console.log('saved');
-              });
-        }) : console.log("Download was canceled!");      
-    }
-})
-
-/////////////END DOWNLOAD///////////////
 function renderIcon(icon) {
     return function renderIcon(ctx, left, top, styleOverride, fabricObject) {
     var size = this.cornerSize;
