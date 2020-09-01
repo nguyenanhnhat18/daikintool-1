@@ -394,16 +394,6 @@ function undo_redo_enable(state, mods) {
     mods > 0 ? $('.b-header__redo').removeClass('is-disabled') : $('.b-header__redo').addClass('is-disabled');
 }
 
-function makeLine(coords) {
-    return new fabric.Line(coords, {
-        fill: 'blue',
-        stroke: 'blue',
-        strokeWidth: 5,
-        selectable: false,
-        evented: false,
-    });
-}
-
 class Daikin {
     constructor(id, quantity, type) {
         this.id = this.setID();
@@ -438,7 +428,7 @@ class Daikin {
         if(this.quantity < 0){
             this.updateQuantity()
         } else {
-            let c = fabric.Image.fromURL(e.src, (oImg)=>{
+            fabric.Image.fromURL(e.src, (oImg)=>{
                 let l = canvas.width / 2;
                 let t = canvas.height / 2;
                 oImg.scale(0.2);
@@ -446,10 +436,12 @@ class Daikin {
                     "id": this.id
                 });
                 oImg.set({
-                    'left': l
+                    // 'left': l
+                    'left': 10
                 });
                 oImg.set({
-                    'top': t
+                    // 'top': t
+                    'top': 10
                 });
                 oImg.set({
                     "transparentCorners": false
@@ -457,18 +449,18 @@ class Daikin {
                 oImg.set({
                     "centeredScaling": true
                 });
-               
-                canvas.add(makeLine())
-                canvas.add(oImg);
-                
+                           
+                canvas.add(oImg);                
+                oImg.line1 = line1;
+                oImg.line2 = line2;
                 UpdateModif(true);
-                // c.line1 = line1;
-                // c.line2 = line2;
-                // return c;
-            }
-            );
-           
+                return oImg;                
+                
+            });
+            
+            
         }           
+        
     }
 
     checkQuantity() {
@@ -498,16 +490,31 @@ class Daikin {
             this._OnDel();
             canvas.remove(canvas.getActiveObject());
             $(".deleteBtn").remove();
+            
             UpdateModif(true);
         }
     }
+}
+
+function makeLine(coords) {
+    return new fabric.Line(coords, {
+        fill: 'blue',
+        stroke: 'blue',
+        strokeWidth: 5,
+        selectable: false,
+        evented: false,
+        dirty: false
+    });
 }
 
 let daikin_Us7 = new Daikin(0,2,"daikin-us7");
 let daikin_OutDoor = new Daikin(0,2,"daikin_outdoor");
 
 // add delete button
-$(document).on('click', ".deleteBtn", ()=>{
+$(document).on('click', ".deleteBtn", (e)=>{
+    
+    // obj.line1 && obj.line1.set({ 'x1': 0, 'y1': 0 });
+    // obj.line2 && obj.line2.set({ 'x2': 0, 'y2': 0 });
     daikin_Us7.delete()
 }
 );
@@ -515,7 +522,9 @@ $(document).on('click', ".deleteBtn", ()=>{
 // $(document).on('click',".deleteBtn",()=>{daikin_Nexura.delete()});
 // $(document).on('click',".deleteBtn",()=>{daikin_Temp.delete()});
 
-$(document).on('click', ".deleteBtn", ()=>{
+$(document).on('click', ".deleteBtn", (e)=>{
+    // obj.line1 && obj.line1.set({ 'x1': 0, 'y1': 0 });
+    // obj.line2 && obj.line2.set({ 'x2': 0, 'y2': 0 });
     daikin_OutDoor.delete()
 }
 );
@@ -537,7 +546,7 @@ canvas.on('object:selected', (e)=>{
     $('.b-header__rotate_90deg_right').removeClass('is-disabled');
     $('#wrapCanvas').off('mousedown', mouseDownHandler);
     UpdateModif(false);
-    addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);
+    addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);    
     cur_angle = e.target.angle;
 }
 );
@@ -566,10 +575,14 @@ canvas.on('mouse:up', (e)=>{
 );
 canvas.on('object:modified', (e)=>{    
     UpdateModif(true);
-    console.log(e.target.left, e.target.top)
-    addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);    
+    addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);
+    let obj = e.target
+    if(obj.line1 !== null && obj.line2 !== null){
+        console.log('YEAHHHHHHHHHHHHHHH BUGS')
+    }
 }
-, 'object:added', ()=>{
+, 'object:added', (e)=>{
+    let obj = e.target;
     UpdateModif(true);
 }
 );
@@ -588,11 +601,11 @@ canvas.on('object:rotating', (e)=>{
 // canvas moving limit   
 canvas.on('object:moving', (e)=>{
     UpdateModif(false);
-    // console.log(line)
-    var obj = e.target;
-    obj.line1 && obj.line1.set({ 'x2': obj.left, 'y2': obj.top });
-    obj.line2 && obj.line2.set({ 'x1': obj.left, 'y1': obj.top });
-
+    let obj = e.target;
+    
+    obj.line1 && obj.line1.set({ 'x1': obj.left, 'y1': obj.top });
+    obj.line2 && obj.line2.set({ 'x2': obj.left, 'y2': obj.top });
+    
     // if object is too big ignore
     if (obj.currentHeight > obj.canvas.height || obj.currentWidth > obj.canvas.width) {
         return;
@@ -615,31 +628,46 @@ canvas.on('object:moving', (e)=>{
 // end canvas moving limit
 
 // add component
-
-// $("#daikin-nexura").click(()=>{            
-//     daikin_Nexura.addImg($("#daikin-nexura")[0]);
-// });
-
-// $("#daikin-temp").click(()=>{            
-//     daikin_Temp.addImg($("#daikin-temp")[0]);
-// });
-
+let clicked = 0;
+let line = [];
 $("#daikin-option").on('click', '#daikin-us7', ()=>{
     // old error code daikin_OutDoor.addImg($("#daikin_outdoor")[0])
     
-    daikin_Us7.addImg($("#daikin-us7")[0]),
-    daikin_OutDoor.addImg($("#daikin_outdoor")[0])
-        
-    // daikin_Us7.addImg($("#daikin-us7")[0]);
-    // daikin_OutDoor.addImg($("#daikin_outdoor")[0]);
+    line.push(makeLine());    
 
-    // canvas.add(line[0])
+    if(line.length > 1){
+        line.shift()
+    }
+    if(daikin_Us7.quantity !== 0){
+        for(let x in line){         
+            
+            daikin_Us7.addImg($("#daikin-us7")[0], null, line[x]);
+            daikin_OutDoor.addImg($("#daikin_outdoor")[0], line[x], null);
+            canvas.add(line[x]);
+                                 
+        }
+    } else {
+        daikin_Us7.updateQuantity()
+    }            
 }
 );
 
 $("#daikin-option").on('click', '#daikin_outdoor', ()=>{
-    daikin_Us7.addImg($("#daikin-us7")[0]);
-    daikin_OutDoor.addImg($("#daikin_outdoor")[0]);
+   
+    line.push(makeLine());    
+    if(line.length > 1){
+        line.shift();
+    }
+    if(daikin_OutDoor.quantity !== 0){
+        for(let x in line){
+            console.log(line[x])        
+            daikin_OutDoor.addImg($("#daikin_outdoor")[0], line[x], null);  
+            daikin_Us7.addImg($("#daikin-us7")[0], null, line[x]);
+            canvas.add(line[x]);  
+        }
+    } else {
+        daikin_OutDoor.updateQuantity();
+    }
 }
 );
 //end add component
@@ -666,71 +694,71 @@ function setBgImage(ele) {
     // UpdateModif(true);
 }
 
-let val = 1;
-val = (val * 10 + 0.01 * 10) / 10;
+// let val = 1;
+// val = (val * 10 + 0.01 * 10) / 10;
 
-$("#zoomIn").click(()=>{
-    if (canvas.backgroundImage === null || canvas.backgroundImage === undefined) {
-        canvas.clear().renderAll();
-    } else {
-        sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] * val), Math.round(sizeOfcanvasBg[1] * val)];
-        canvas.setDimensions({
-            width: sizeOfcanvasBg[0],
-            height: sizeOfcanvasBg[1]
-        });
-        canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
-            scaleX: canvas.width / img.naturalWidth,
-            scaleY: canvas.height / img.naturalHeight
-        });
-        canvas.renderAll();
-        UpdateModif(true);
-    }
-    for (let i in canvas._objects) {
-        // let oCoordskey = Object.keys(canvas._objects[i].oCoords);
+// $("#zoomIn").click(()=>{
+//     if (canvas.backgroundImage === null || canvas.backgroundImage === undefined) {
+//         canvas.clear().renderAll();
+//     } else {
+//         sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] * val), Math.round(sizeOfcanvasBg[1] * val)];
+//         canvas.setDimensions({
+//             width: sizeOfcanvasBg[0],
+//             height: sizeOfcanvasBg[1]
+//         });
+//         canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
+//             scaleX: canvas.width / img.naturalWidth,
+//             scaleY: canvas.height / img.naturalHeight
+//         });
+//         canvas.renderAll();
+//         UpdateModif(true);
+//     }
+//     for (let i in canvas._objects) {
+//         // let oCoordskey = Object.keys(canvas._objects[i].oCoords);
 
-        canvas._objects[i].left *= val;
-        canvas._objects[i].top *= val;
+//         canvas._objects[i].left *= val;
+//         canvas._objects[i].top *= val;
 
-        canvas._objects[i].translateX *= val;
-        canvas._objects[i].translateY *= val;
+//         canvas._objects[i].translateX *= val;
+//         canvas._objects[i].translateY *= val;
 
-        canvas.item(i).setCoords();
-    }
-    canvas.discardActiveObject().renderAll();
-    $(".deleteBtn").remove();
-}
-)
+//         canvas.item(i).setCoords();
+//     }
+//     canvas.discardActiveObject().renderAll();
+//     $(".deleteBtn").remove();
+// }
+// )
 
-$("#zoomOut").click(()=>{
-    if (canvas.backgroundImage === null || canvas.backgroundImage === undefined) {
-        canvas.clear().renderAll();
-    } else {
-        sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];
-        canvas.setDimensions({
-            width: sizeOfcanvasBg[0],
-            height: sizeOfcanvasBg[1]
-        });
-        canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
-            scaleX: canvas.width / img.naturalWidth,
-            scaleY: canvas.height / img.naturalHeight
-        });
-        canvas.renderAll();
-        UpdateModif(true);
-    }
-    for (let i in canvas._objects) {
-        // let oCoordskey = Object.keys(canvas._objects[i].oCoords);
+// $("#zoomOut").click(()=>{
+//     if (canvas.backgroundImage === null || canvas.backgroundImage === undefined) {
+//         canvas.clear().renderAll();
+//     } else {
+//         sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];
+//         canvas.setDimensions({
+//             width: sizeOfcanvasBg[0],
+//             height: sizeOfcanvasBg[1]
+//         });
+//         canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
+//             scaleX: canvas.width / img.naturalWidth,
+//             scaleY: canvas.height / img.naturalHeight
+//         });
+//         canvas.renderAll();
+//         UpdateModif(true);
+//     }
+//     for (let i in canvas._objects) {
+//         // let oCoordskey = Object.keys(canvas._objects[i].oCoords);
 
-        canvas._objects[i].left /= val;
-        canvas._objects[i].top /= val;
+//         canvas._objects[i].left /= val;
+//         canvas._objects[i].top /= val;
 
-        canvas._objects[i].translateX /= val;
-        canvas._objects[i].translateY /= val;
-        canvas.item(i).setCoords();
-    }
-    canvas.discardActiveObject().renderAll();
-    $(".deleteBtn").remove();
-}
-)
+//         canvas._objects[i].translateX /= val;
+//         canvas._objects[i].translateY /= val;
+//         canvas.item(i).setCoords();
+//     }
+//     canvas.discardActiveObject().renderAll();
+//     $(".deleteBtn").remove();
+// }
+// )
 
 //Rotate Objects Function
 let deg = 0;
