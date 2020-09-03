@@ -44,12 +44,12 @@
                     </div>
                     <div class="b-header__item b-header__rotate_left" id="rot_lef" title="Rotate Left" mode="Rotate Left" data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
-                            <img src="icon/rl-45.png" height="100%" alt="">
+                            <img src="icon/rr_15.png" height="100%" alt="">
                         </span>
                     </div>
                     <div class="b-header__item b-header__rotate_right" id="rot_rig" title="Rotate Right" mode="Rotate Right" data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
-                            <img src="icon/rr_45.png" height="100%" alt="">
+                            <img src="icon/rl-15.png" height="100%" alt="">
                         </span>
                     </div>
                     <div class="b-header__item b-header__rotate_90deg_left" id="rot_90_lef" title="Rotate 90 Degree Left" mode="Rotate 90 Degree Left" data-modes="editor noauth">
