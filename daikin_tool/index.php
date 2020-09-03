@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -87,7 +86,9 @@
             </header>
         </div>
         <div class="b-page__editor" id="editor">
-            <div class="workArea" id="wrapCanvas" style="top: 10%; background: gray">
+        
+            <div class="workArea" id="wrapCanvas" style="overflow: hidden; top: 10%; left: 5%; background: gray">
+
                 <canvas id="c"></canvas>
             </div>
         </div>
@@ -176,5 +177,4 @@
     <script src="lib/jquery-ui-1.12.1/jquery-ui.js" type="text/javascript"></script>
     <script src="js/main.js" type="text/javascript"></script>
 </body>
-
 </html>

@@ -112,7 +112,7 @@
         });
 
         function downloadFloorPlanFromSuite(quote_id, pre_install_photos_c, callback) {
-            $('.loading').find('h3').text('Preparring Floor Plan');
+            $('.loading').find('h3').text('Preparing Floor Plan');
             $.ajax({
                 url: "APIGetPlanFloorFromSuite.php",
                 data: {
@@ -307,14 +307,10 @@ fabric.Object.prototype.setControlsVisibility({
     mtr: true
 });
 
-let canvas = this.__canvas = new fabric.Canvas('c', {
-    allowTouchScrolling : true
-});
+let canvas = this.__canvas = new fabric.Canvas('c');
 fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
 
-function dialog(message, diagTle='Notify', yes=()=>{}
-, no=()=>{}
-) {
+function dialog(message, diagTle='Notify', yes=()=>{}, no=()=>{}) {
     $('.wrapper').css({
         '-webkit-filter': 'blur(10px)',
         '-moz-filter': 'blur(10px)',
@@ -437,11 +433,11 @@ class Daikin {
                 });
                 oImg.set({
                     // 'left': l
-                    'left': 10
+                    'left': 20
                 });
                 oImg.set({
                     // 'top': t
-                    'top': 10
+                    'top': 20
                 });
                 oImg.set({
                     "transparentCorners": false
@@ -482,18 +478,32 @@ class Daikin {
     }
 
     delete() {
-        $('.b-header__rotate_left').addClass('is-disabled');
-        $('.b-header__rotate_right').addClass('is-disabled');
-        $('.b-header__rotate_90deg_left').addClass('is-disabled');
-        $('.b-header__rotate_90deg_right').addClass('is-disabled');
+        header_disable()
         if (canvas.getActiveObject() && this.id === canvas.getActiveObject().id) {
             this._OnDel();
             canvas.remove(canvas.getActiveObject());
-            $(".deleteBtn").remove();
-            
+            $(".deleteBtn").remove();            
             UpdateModif(true);
         }
     }
+}
+
+function header_disable(){
+    $('.b-header__rotate_left').addClass('is-disabled');
+    $('.b-header__rotate_right').addClass('is-disabled');
+    $('.b-header__rotate_90deg_left').addClass('is-disabled');
+    $('.b-header__rotate_90deg_right').addClass('is-disabled');
+    $('.b-header__copy').addClass('is-disabled');
+    $('.b-header__paste').addClass('is-disabled');
+}
+
+function header_enable(){
+    $('.b-header__rotate_left').removeClass('is-disabled');
+    $('.b-header__rotate_right').removeClass('is-disabled');
+    $('.b-header__rotate_90deg_left').removeClass('is-disabled');
+    $('.b-header__rotate_90deg_right').removeClass('is-disabled');
+    $('.b-header__copy').removeClass('is-disabled');
+    $('.b-header__paste').removeClass('is-disabled');
 }
 
 function makeLine(coords) {
@@ -529,21 +539,28 @@ $(document).on('click', ".deleteBtn", (e)=>{
 }
 );
 
+$(document).on('click', ".deleteBtn", (e)=>{
+    // obj.line1 && obj.line1.set({ 'x1': 0, 'y1': 0 });
+    // obj.line2 && obj.line2.set({ 'x2': 0, 'y2': 0 });
+    if(canvas.getActiveObject()){
+        canvas.remove(canvas.getActiveObject())
+        $(".deleteBtn").remove();
+    }
+})
 //create delete buttons
+
 function addDeleteBtn(x, y) {
     $(".deleteBtn").remove();
     var btnLeft = x;
     var btnTop = y - 25;
     var deleteBtn = '<img src="icon/close-img.png" class="deleteBtn" style="position:absolute;top:' + btnTop + 'px;left:' + btnLeft + 'px;cursor:pointer;width:20px;height:20px;"/>';
     $(".canvas-container").append(deleteBtn);
+    UpdateModif(true);
 }
 // end create delete buttons
 
 canvas.on('object:selected', (e)=>{
-    $('.b-header__rotate_left').removeClass('is-disabled');
-    $('.b-header__rotate_right').removeClass('is-disabled');
-    $('.b-header__rotate_90deg_left').removeClass('is-disabled');
-    $('.b-header__rotate_90deg_right').removeClass('is-disabled');
+    header_enable();
     $('#wrapCanvas').off('mousedown', mouseDownHandler);
     UpdateModif(false);
     addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);    
@@ -558,13 +575,9 @@ canvas.on('mouse:down', (e)=>{
         cur_angle = e.target.angle;
         addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);
         UpdateModif(false);
-    }
-    if (!canvas.getActiveObject()) {
+    } else {
         $('#wrapCanvas').on('mousedown', mouseDownHandler);
-        $('.b-header__rotate_left').addClass('is-disabled');
-        $('.b-header__rotate_right').addClass('is-disabled');
-        $('.b-header__rotate_90deg_left').addClass('is-disabled');
-        $('.b-header__rotate_90deg_right').addClass('is-disabled');
+        header_disable();
         $(".deleteBtn").remove();
     }
 }
@@ -576,13 +589,8 @@ canvas.on('mouse:up', (e)=>{
 canvas.on('object:modified', (e)=>{    
     UpdateModif(true);
     addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);
-    let obj = e.target
-    if(obj.line1 !== null && obj.line2 !== null){
-        console.log('YEAHHHHHHHHHHHHHHH BUGS')
-    }
 }
 , 'object:added', (e)=>{
-    let obj = e.target;
     UpdateModif(true);
 }
 );
@@ -628,7 +636,7 @@ canvas.on('object:moving', (e)=>{
 // end canvas moving limit
 
 // add component
-let clicked = 0;
+
 let line = [];
 $("#daikin-option").on('click', '#daikin-us7', ()=>{
     // old error code daikin_OutDoor.addImg($("#daikin_outdoor")[0])
@@ -640,11 +648,9 @@ $("#daikin-option").on('click', '#daikin-us7', ()=>{
     }
     if(daikin_Us7.quantity !== 0){
         for(let x in line){         
-            
             daikin_Us7.addImg($("#daikin-us7")[0], null, line[x]);
             daikin_OutDoor.addImg($("#daikin_outdoor")[0], line[x], null);
-            canvas.add(line[x]);
-                                 
+            canvas.add(line[x]);                                 
         }
     } else {
         daikin_Us7.updateQuantity()
@@ -694,10 +700,59 @@ function setBgImage(ele) {
     // UpdateModif(true);
 }
 
-// let val = 1;
-// val = (val * 10 + 0.01 * 10) / 10;
+// Copy and Paste
+$('#copy').on('click',() =>{
+	// clone what are you copying since you
+	// may want copy and paste on different moment.
+	// and you do not want the changes happened
+	// later to reflect on the copy.
+	canvas.getActiveObject().clone(function(cloned) {
+        // _clipboard = cloned;
+        cloned.left += 20;
+        cloned.top += 20;
+        canvas.add(cloned);   
+    });
+    // var canvas = target.canvas;
+    // target.clone(function(cloned) {
+    //   cloned.left += 10;
+    //   cloned.top += 10;
+    //   canvas.add(cloned);
+    // });
+    
+});
 
-// $("#zoomIn").click(()=>{
+// $('#paste').on('click',() =>{
+// 	// clone again, so you can do multiple copies.
+// 	_clipboard.clone(function(clonedObj) {
+// 		canvas.discardActiveObject();
+// 		clonedObj.set({
+// 			left: clonedObj.left + 10,
+// 			top: clonedObj.top + 10,
+// 			evented: true,
+// 		});
+// 		if (clonedObj.type === 'activeSelection') {
+// 			// active selection needs a reference to the canvas.
+// 			clonedObj.canvas = canvas;
+// 			clonedObj.forEachObject(function(obj) {
+// 				canvas.add(obj);
+// 			});
+// 			// this should solve the unselectability
+// 			clonedObj.setCoords();
+// 		} else {
+// 			canvas.add(clonedObj);
+// 		}
+// 		_clipboard.top += 10;
+// 		_clipboard.left += 10;
+// 		canvas.setActiveObject(clonedObj);
+// 		canvas.requestRenderAll();
+// 	});
+// });
+
+//End Copy and Paste
+let val = 1;
+val = (val * 10 + 0.01 * 10) / 10;
+let scaleRatio;
+$("#zoomIn").click(()=>{
 //     if (canvas.backgroundImage === null || canvas.backgroundImage === undefined) {
 //         canvas.clear().renderAll();
 //     } else {
@@ -726,8 +781,16 @@ function setBgImage(ele) {
 //     }
 //     canvas.discardActiveObject().renderAll();
 //     $(".deleteBtn").remove();
-// }
-// )
+
+
+scaleRatio = 1; // Math.min($("#wrapCanvas").width / canvas.width, $("#wrapCanvas").heigh/canvas.height);
+// canvas.setDimensions({ width: canvas.getWidth() * scaleRatio, height: canvas.getHeight() * scaleRatio });
+canvas.setZoom(scaleRatio);
+console.log(canvas.height * val)
+console.log(canvas.width * val)
+
+}
+)
 
 // $("#zoomOut").click(()=>{
 //     if (canvas.backgroundImage === null || canvas.backgroundImage === undefined) {
@@ -767,7 +830,9 @@ let setAngle = ()=>{
     deg = cur_angle;
     if (canvas.getActiveObject() !== null && canvas.getActiveObject() !== undefined) {
         canvas.getActiveObject().set({
-            'angle': deg
+            'angle': deg,
+            // 'originX': 'center',
+            // 'originY': 'center',
         });
         canvas.getActiveObject().setCoords();
     }
@@ -844,6 +909,7 @@ function modifyCanvas() {
             });
         }
     }
+    header_disable();
 }
 
 $('#undoBtn').click(()=>{
@@ -880,6 +946,7 @@ $('#redoBtn').click(()=>{
 )
 ////////END UNDO AND REDO //////////
 
+//
 function renderIcon(icon) {
     return function renderIcon(ctx, left, top, styleOverride, fabricObject) {
         var size = this.cornerSize;
