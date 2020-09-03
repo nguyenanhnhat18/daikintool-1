@@ -42,22 +42,22 @@
                             <img src="icon/clear.png" height="100%" alt="">
                         </span>
                     </div>
-                    <div class="b-header__item b-header__rotate_left" id="rot_lef" title="Rotate Left" mode="Rotate Left" data-modes="editor noauth">
+                    <div class="b-header__item b-header__rotate_left is-disabled" id="rot_lef" title="Rotate Left" mode="Rotate Left" data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
                             <img src="icon/rr_15.png" height="100%" alt="">
                         </span>
                     </div>
-                    <div class="b-header__item b-header__rotate_right" id="rot_rig" title="Rotate Right" mode="Rotate Right" data-modes="editor noauth">
+                    <div class="b-header__item b-header__rotate_right is-disabled" id="rot_rig" title="Rotate Right" mode="Rotate Right" data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
                             <img src="icon/rl-15.png" height="100%" alt="">
                         </span>
                     </div>
-                    <div class="b-header__item b-header__rotate_90deg_left" id="rot_90_lef" title="Rotate 90 Degree Left" mode="Rotate 90 Degree Left" data-modes="editor noauth">
+                    <div class="b-header__item b-header__rotate_90deg_left is-disabled" id="rot_90_lef" title="Rotate 90 Degree Left" mode="Rotate 90 Degree Left" data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
                             <img src="icon/rl_90.png" height="100%" alt="">
                         </span>
                     </div>
-                    <div class="b-header__item b-header__rotate_90deg_right" id="rot_90_rig" title="Rotate 90 Degree Right" mode="Rotate 90 Degree Right" data-modes="editor noauth">
+                    <div class="b-header__item b-header__rotate_90deg_right is-disabled" id="rot_90_rig" title="Rotate 90 Degree Right" mode="Rotate 90 Degree Right" data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
                             <img src="icon/rr_90.png" height="100%" alt="">
                         </span>
