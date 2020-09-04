@@ -56,6 +56,11 @@
                             <img src="icon/rr_90.png" height="100%" alt="">
                         </span>
                     </div>
+                    <div class="b-header__item b-header__copy is-disabled" id="copy" title="Copy and Paste" mode="Copy and Paste" data-modes="editor noauth">
+                        <span class="b-icon b-header__icon">
+                            <img src="icon/copy.png" height="100%" alt="">
+                        </span>
+                    </div>
                 </div>
                 <div class="b-header__center">
                     <div class="b-header__switch">
