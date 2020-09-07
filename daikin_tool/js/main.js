@@ -86,7 +86,7 @@
                         var itemDaikin = '<div class="pane-affix__catalog-column is-2">\
                                             <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
                                                 <div class="item-texture__image">\
-                                                    <img src="icon/daikin-us7.jpg" id="daikin-us7" alt="">\
+                                                    <img src="icon/daikin_indoor_cv.png" id="daikin-us7" alt="">\
                                                 </div>\
                                             </a>\
                                             <span><strong>' + res['products'][keys[i]]['Product'] + '(' + res['products'][keys[i]]['Quantity'] + 'X)</strong></span>\
@@ -94,7 +94,7 @@
                         var itemDaikinOutdoor = '<div class="pane-affix__catalog-column is-2">\
                                             <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
                                                 <div class="item-texture__image">\
-                                                    <img src="icon/daikin_outdoor.png" id="daikin_outdoor" alt="">\
+                                                    <img src="icon/daikin_outdoor_cv.png" id="daikin_outdoor" alt="">\
                                                 </div>\
                                             </a>\
                                             <span><strong>' + res['products'][keys[i]]['Product'] + '-Outdoor (' + res['products'][keys[i]]['Quantity'] + 'X)</strong></span>\
@@ -157,7 +157,7 @@
             var itemDaikin = '<div class="pane-affix__catalog-column is-2">\
                                 <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
                                     <div class="item-texture__image">\
-                                        <img src="icon/daikin-us7.jpg" id="daikin-us7" alt="">\
+                                        <img src="icon/daikin_indoor_cv.png" id="daikin-us7" alt="">\
                                     </div>\
                                 </a>\
                                 <span><strong>Daikin indoor(10X)</strong></span>\
@@ -165,7 +165,7 @@
             var itemDaikinOutdoor = '<div class="pane-affix__catalog-column is-2">\
                                 <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
                                     <div class="item-texture__image">\
-                                        <img src="icon/daikin_outdoor.png" id="daikin_outdoor" alt="">\
+                                        <img src="icon/daikin_outdoor_cv.png" id="daikin_outdoor" alt="">\
                                     </div>\
                                 </a>\
                                 <span><strong>Daikin outdoor(10X)</strong></span>\
@@ -413,8 +413,9 @@ class Daikin {
     }
 
     updateQuantity() {
-        this.quantity = 0;
-        dialog(`Limited Quantity!\nPlease Delete Components`);
+        if(this.quantity === 0){
+            dialog(`Limited Quantity!\nPlease Delete Components`);
+        }        
     }
 
     addImg(e, line1, line2) {
@@ -432,12 +433,12 @@ class Daikin {
                     "id": this.id
                 });
                 oImg.set({
-                    // 'left': l
-                    'left': 20
+                    'left': l
+                    // 'left': 20
                 });
                 oImg.set({
-                    // 'top': t
-                    'top': 20
+                    'top': t
+                    // 'top': 20
                 });
                 oImg.set({
                     "transparentCorners": false
@@ -473,18 +474,38 @@ class Daikin {
                 this.quantity = this.count - this.quantity;
             }
         } else {
-            this.quantity = this.count
+            this.quantity = this.count;
         }
     }
 
     delete() {
-        header_disable()
+        header_disable();
         if (canvas.getActiveObject() && this.id === canvas.getActiveObject().id) {
-            this._OnDel();
-            canvas.remove(canvas.getActiveObject());
-            $(".deleteBtn").remove();            
+            if(this.quantity < this.count){
+                this._OnDel();
+            }            
+            for(let i = arrayItems.indexOf(canvas.getActiveObject()); i >= 0; i--){
+                if(canvas.getActiveObject() !== null && (canvas.getActiveObject().line1 !== undefined || canvas.getActiveObject().line2 !== undefined)){
+                    if(arrayItems[i].id === undefined){
+                        let validChain = arrayItems.indexOf(canvas.getActiveObject()) - arrayItems.indexOf(arrayItems[i]);
+                        if(validChain === 1 || validChain === 2){
+                            arrayItems.splice(arrayItems.indexOf(arrayItems[i]), 1);
+                            canvas.remove(canvas.getActiveObject());
+                            $(".deleteBtn").remove();          
+                            canvas.discardActiveObject();
+                            canvas.renderAll();
+                            return arrayItems;
+                        }
+                    }
+                } else {
+                    canvas.remove(canvas.getActiveObject());
+                    $(".deleteBtn").remove();          
+                    canvas.discardActiveObject(); 
+                    canvas.renderAll();
+                }                
+            }
             UpdateModif(true);
-        }
+        }        
     }
 }
 
@@ -517,15 +538,13 @@ function makeLine(coords) {
     });
 }
 
-let daikin_Us7 = new Daikin(0,2,"daikin-us7");
-let daikin_OutDoor = new Daikin(0,2,"daikin_outdoor");
+let daikin_Us7 = new Daikin(0, 2,"daikin-us7");
+let daikin_OutDoor = new Daikin(0, 2,"daikin_outdoor");
 
 // add delete button
+let arrayItems = canvas._objects;
 $(document).on('click', ".deleteBtn", (e)=>{
-    
-    // obj.line1 && obj.line1.set({ 'x1': 0, 'y1': 0 });
-    // obj.line2 && obj.line2.set({ 'x2': 0, 'y2': 0 });
-    daikin_Us7.delete()
+    daikin_Us7.delete();
 }
 );
 
@@ -533,20 +552,19 @@ $(document).on('click', ".deleteBtn", (e)=>{
 // $(document).on('click',".deleteBtn",()=>{daikin_Temp.delete()});
 
 $(document).on('click', ".deleteBtn", (e)=>{
-    // obj.line1 && obj.line1.set({ 'x1': 0, 'y1': 0 });
-    // obj.line2 && obj.line2.set({ 'x2': 0, 'y2': 0 });
-    daikin_OutDoor.delete()
+    daikin_OutDoor.delete();
 }
 );
 
+
 $(document).on('click', ".deleteBtn", (e)=>{
-    // obj.line1 && obj.line1.set({ 'x1': 0, 'y1': 0 });
-    // obj.line2 && obj.line2.set({ 'x2': 0, 'y2': 0 });
+
     if(canvas.getActiveObject()){
         canvas.remove(canvas.getActiveObject())
         $(".deleteBtn").remove();
     }
-})
+    
+});
 //create delete buttons
 
 function addDeleteBtn(x, y) {
@@ -561,7 +579,7 @@ function addDeleteBtn(x, y) {
 
 canvas.on('object:selected', (e)=>{
     header_enable();
-    $('#wrapCanvas').off('mousedown', mouseDownHandler);
+    $('#wrapCanvas').off('mousedown', mouseDownHandler);    
     UpdateModif(false);
     addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);    
     cur_angle = e.target.angle;
@@ -639,38 +657,48 @@ canvas.on('object:moving', (e)=>{
 
 let line = [];
 $("#daikin-option").on('click', '#daikin-us7', ()=>{
-    // old error code daikin_OutDoor.addImg($("#daikin_outdoor")[0])
-    
-    line.push(makeLine());    
-
+    // old error code daikin_OutDoor.addImg($("#daikin_outdoor")[0])       
+    let l = canvas.width / 2;
+    let t = canvas.height / 2;
+    line.push(makeLine([l, t, l, t]));
     if(line.length > 1){
         line.shift()
     }
-    if(daikin_Us7.quantity !== 0){
-        for(let x in line){         
-            daikin_Us7.addImg($("#daikin-us7")[0], null, line[x]);
-            daikin_OutDoor.addImg($("#daikin_outdoor")[0], line[x], null);
+    if(daikin_Us7.quantity !== 0 && daikin_OutDoor.quantity !== 0){
+        for(let x in line){
+            daikin_OutDoor.addImg($("#daikin_outdoor")[0], line[x], null);         
+            daikin_Us7.addImg($("#daikin-us7")[0], null, line[x]);            
             canvas.add(line[x]);                                 
         }
-    } else {
-        daikin_Us7.updateQuantity()
-    }            
+    } else if(daikin_Us7.quantity !== 0){
+        daikin_Us7.addImg($("#daikin-us7")[0]);
+    } else if(daikin_OutDoor.quantity !== 0){
+        daikin_OutDoor.addImg($("#daikin_outdoor")[0]);
+    }
+    else {
+        daikin_Us7.updateQuantity();
+    }
 }
 );
 
 $("#daikin-option").on('click', '#daikin_outdoor', ()=>{
-   
-    line.push(makeLine());    
+    
+    let l = canvas.width / 2;
+    let t = canvas.height / 2;
+    line.push(makeLine([l, t, l, t]));    
     if(line.length > 1){
         line.shift();
     }
-    if(daikin_OutDoor.quantity !== 0){
-        for(let x in line){
-            console.log(line[x])        
-            daikin_OutDoor.addImg($("#daikin_outdoor")[0], line[x], null);  
+    if(daikin_Us7.quantity !== 0 && daikin_OutDoor.quantity !== 0){
+        for(let x in line){        
+            daikin_OutDoor.addImg($("#daikin_outdoor")[0], line[x], null);
             daikin_Us7.addImg($("#daikin-us7")[0], null, line[x]);
-            canvas.add(line[x]);  
+            canvas.add(line[x]);
         }
+    } else if(daikin_Us7.quantity !== 0) {
+        daikin_Us7.addImg($("#daikin-us7")[0]);
+    } else if(daikin_OutDoor.quantity !== 0) {
+        daikin_OutDoor.addImg($("#daikin_outdoor")[0]);
     } else {
         daikin_OutDoor.updateQuantity();
     }
@@ -705,13 +733,28 @@ $('#copy').on('click',() =>{
 	// clone what are you copying since you
 	// may want copy and paste on different moment.
 	// and you do not want the changes happened
-	// later to reflect on the copy.
-	canvas.getActiveObject().clone(function(cloned) {
-        // _clipboard = cloned;
-        cloned.left += 20;
-        cloned.top += 20;
-        canvas.add(cloned);   
-    });
+    // later to reflect on the copy.
+    if(daikin_Us7.quantity <= 0){
+        daikin_Us7.updateQuantity();
+    } else if (daikin_OutDoor.quantity <= 0){
+        daikin_OutDoor.updateQuantity();
+    } else if(daikin_Us7.quantity !== 0 || daikin_OutDoor.quantity !== 0) {
+        canvas.getActiveObject().clone(function(cloned) {
+            // _clipboard = cloned;
+            cloned.left += 20;
+            cloned.top += 20;
+            cloned.set({
+                id : canvas.getActiveObject().id,
+                "transparentCorners": false
+            });
+            canvas.add(cloned);
+        });
+    }
+    
+    
+    
+    UpdateModif(true); 
+    
     // var canvas = target.canvas;
     // target.clone(function(cloned) {
     //   cloned.left += 10;
@@ -959,4 +1002,3 @@ function renderIcon(icon) {
 }
 
 canvas.renderAll();
-

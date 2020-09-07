@@ -1,9 +1,11 @@
 <html lang="en">
 
+
 <head>
     <title>Daikin Design Tool By Pure Electric</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
 
     <link rel="icon" type="image/png" href="icon/logo_pure_icon.png" />
 
@@ -11,12 +13,15 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" type="text/css" href="lib/jquery-ui-1.12.1/jquery-ui.css">
 
+
 </head>
 
 <body>
     <div class="wrapper">
+
         <input type="hidden" id="quote_id" value="">
         <input type="hidden" id="pre_install_photos_c" value="">
+
         <div class="b-page__header">
             <header class="b-header">
                 <div class="b-header__left">
@@ -38,12 +43,12 @@
                     </div>
                     <div class="b-header__item b-header__rotate_left is-disabled" id="rot_lef" title="Rotate Left" mode="Rotate Left" data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
-                            <img src="icon/rl-45.png" height="100%" alt="">
+                            <img src="icon/rr_15.png" height="100%" alt="">
                         </span>
                     </div>
                     <div class="b-header__item b-header__rotate_right is-disabled" id="rot_rig" title="Rotate Right" mode="Rotate Right" data-modes="editor noauth">
                         <span class="b-icon b-header__icon">
-                            <img src="icon/rr_45.png" height="100%" alt="">
+                            <img src="icon/rl-15.png" height="100%" alt="">
                         </span>
                     </div>
                     <div class="b-header__item b-header__rotate_90deg_left is-disabled" id="rot_90_lef" title="Rotate 90 Degree Left" mode="Rotate 90 Degree Left" data-modes="editor noauth">
@@ -69,9 +74,11 @@
                                 <img src="icon/logoPure.png" height="100%" alt=""><span style="margin-left: 10px">Pure
                                     Electric</span>
                             </div>
+
                             <!-- <div class="b-switch__item js-switch-item" mode="view3d">
                                 <img src="icon/Daikin_logo_white_background.png" height="100%" alt="">
                             </div> -->
+
                         </div>
                     </div>
                 </div>
@@ -92,7 +99,7 @@
         </div>
         <div class="b-page__editor" id="editor">
         
-            <div class="workArea" id="wrapCanvas" style="overflow: hidden; top: 10%; left: 5%; background: gray">
+            <div class="workArea" id="wrapCanvas">
 
                 <canvas id="c"></canvas>
             </div>
@@ -110,7 +117,9 @@
                     </span>
                 </button>
             </div>
+
             <div class="pane-nav js-pane-nav" id="leftPanel" data-modes="editor|noauth">
+
                 <div class="pane-nav__item js-pane-nav-item is-selected" data-href="floor-plan-option" content="1" data-id="1"
                     data-type="floor-plan-option">
                     <span class="pane-nav__item-icon">
@@ -122,6 +131,7 @@
                     <span class="pane-nav__item-icon">
                         <img src="icon/air.png" alt="">
                     </span>
+
                 </div>
             </div>
             <div id="daikin-option" class="pane-affix pane-affix--catalog js-pane-affix" data-target="daikin">
@@ -137,10 +147,12 @@
                     <div class="pane-affix__content pane-affix__content--type-catalog">
                         <div class="pane-affix__catalog" id="daikinItems">
                             <!-- Add Daikin Devices Here -->
+
                         </div>
                     </div>
                 </div>
             </div>
+
             <div id="floor-plan-option" class="pane-affix pane-affix--catalog js-pane-affix" data-target="floor-plan">
                 <div class="pane-affix__container">
                     <div class="pane-affix__header">
