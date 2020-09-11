@@ -26,11 +26,13 @@
                 mods = 0;
                 daikin_Us7.checkQuantity();
                 daikin_OutDoor.checkQuantity();
-                canvas.setBackgroundColor('rgba(255, 255, 255, 255)', canvas.renderAll.bind(canvas));
+                canvas.setBackgroundColor('rgba(255, 255, 255, 255)', canvas.renderAll.bind(canvas));                
                 $('#' + dataType).removeClass('is-active');
                 $(".deleteBtn").remove();
                 canvas.clear().renderAll();
                 check = false;
+                line = [];
+                canvas.setZoom(1);
                 undo_redo_enable(state, mods);
             }
             )
@@ -430,36 +432,94 @@ class Daikin {
                 let t = canvas.height / 2;
                 oImg.scale(0.2);
                 oImg.set({
-                    "id": this.id
+                    "id": this.id,
+                    'left': l,
+                    'top': t,
+                    "transparentCorners": false,
+                    "centeredScaling": true,
+                    'is_clone' : false
                 });
-                oImg.set({
-                    'left': l
-                    // 'left': 20
-                });
-                oImg.set({
-                    'top': t
-                    // 'top': 20
-                });
-                oImg.set({
-                    "transparentCorners": false
-                });
-                oImg.set({
-                    "centeredScaling": true
-                });
+                
                            
                 canvas.add(oImg);                
                 oImg.line1 = line1;
                 oImg.line2 = line2;
+                
                 UpdateModif(true);
+                console.log(l, t)
                 return oImg;                
                 
             });
-            
-            
         }           
-        
     }
 
+    copy_and_paste() {
+    //     if(this.quantity > 0 && canvas.getActiveObject().id === this.id){
+    //         canvas.getActiveObject().clone(function(cloned) {
+    //             // _clipboard = cloned;
+    //             cloned.left += 20;
+    //             cloned.top += 20;
+    //             cloned.set({
+    //                 'id' : canvas.getActiveObject().id,
+    //                 "transparentCorners": false,
+    //                 'is_clone' : true
+    //             });
+    //             let set_line_1;
+    //             let set_line_2;
+    //             if(canvas.getActiveObject().line1 !== null && canvas.getActiveObject().line1 !== undefined){
+    //                 let get_line_1 = canvas.getActiveObject().line1;
+    //                 set_line_1 = makeLine([cloned.left, cloned.top, get_line_1.x2, get_line_1.y2]);
+                   
+    //                 let lca;
+    //                 cloned.set({
+    //                     line1 : null,
+    //                     line2 : set_line_1
+    //                 });
+
+    //                 for(let i = arrayItems.length - 1; i >= 0; i--){
+    //                     if(arrayItems[i].fill === 'blue'){
+    //                         arrayItems.splice(arrayItems.lastIndexOf(arrayItems[i]), 0, set_line_1);
+    //                         lca = arrayItems.lastIndexOf(arrayItems[i]);
+    //                     }
+                        
+    //                     if(arrayItems[i] !== undefined && arrayItems[i].id !== cloned.id && arrayItems[i].is_clone === false){
+    //                         arrayItems[i].set({
+    //                             line1 : set_line_1
+    //                         });
+    //                     }
+    //                 }   
+    //             }
+                
+    //             if(canvas.getActiveObject().line2 !== null && canvas.getActiveObject().line2 !== undefined){
+    //                 let get_line_2 = canvas.getActiveObject().line2;
+    //                 set_line_2 = makeLine([get_line_2.x1, get_line_2.y1, cloned.left, cloned.top]);                    
+
+    //                 let lca;
+    //                 cloned.set({
+    //                     line1 : set_line_2,
+    //                     line2 : null
+    //                 });
+    //                 // for(let i = arrayItems.length - 1; i >= 0; i--){
+    //                 //     if(arrayItems[i].fill === 'blue'){
+    //                 //         console.log(arrayItems.indexOf(arrayItems[i]))
+    //                 //         // arrayItems.splice(arrayItems.lastIndexOf(arrayItems[i]), 0, set_line_2);
+    //                 //         lca = arrayItems.lastIndexOf(arrayItems[i]);
+    //                 //     }
+    //                     // if(arrayItems[i] !== undefined && arrayItems[i].id !== cloned.id && arrayItems[i].is_clone === false){
+    //                     //     arrayItems[i].set({
+    //                     //         line2 : set_line_2
+    //                     //     })
+    //                     // }
+    //                 // };
+                    
+    //             }
+    //             canvas.add(cloned);
+    //         });
+    //         UpdateModif(true);
+    //         this._OnAdd();
+    //     }
+        
+    }
     checkQuantity() {
         let curr_obj = 0;
         if (state[state.length - 1 - mods] !== undefined) {
@@ -538,8 +598,8 @@ function makeLine(coords) {
     });
 }
 
-let daikin_Us7 = new Daikin(0, 2,"daikin-us7");
-let daikin_OutDoor = new Daikin(0, 2,"daikin_outdoor");
+let daikin_Us7 = new Daikin(0, 3,"daikin-us7");
+let daikin_OutDoor = new Daikin(0, 3,"daikin_outdoor");
 
 // add delete button
 let arrayItems = canvas._objects;
@@ -558,9 +618,8 @@ $(document).on('click', ".deleteBtn", (e)=>{
 
 
 $(document).on('click', ".deleteBtn", (e)=>{
-
     if(canvas.getActiveObject()){
-        canvas.remove(canvas.getActiveObject())
+        canvas.remove(canvas.getActiveObject());
         $(".deleteBtn").remove();
     }
     
@@ -665,11 +724,12 @@ $("#daikin-option").on('click', '#daikin-us7', ()=>{
         line.shift()
     }
     if(daikin_Us7.quantity !== 0 && daikin_OutDoor.quantity !== 0){
-        for(let x in line){
-            daikin_OutDoor.addImg($("#daikin_outdoor")[0], line[x], null);         
-            daikin_Us7.addImg($("#daikin-us7")[0], null, line[x]);            
-            canvas.add(line[x]);                                 
-        }
+        // for(let x in line){
+            daikin_OutDoor.addImg($("#daikin_outdoor")[0], null, line[0]);
+            
+            daikin_Us7.addImg($("#daikin-us7")[0], line[0], null);            
+            canvas.add(line[0]);                                 
+        // }
     } else if(daikin_Us7.quantity !== 0){
         daikin_Us7.addImg($("#daikin-us7")[0]);
     } else if(daikin_OutDoor.quantity !== 0){
@@ -692,6 +752,7 @@ $("#daikin-option").on('click', '#daikin_outdoor', ()=>{
     if(daikin_Us7.quantity !== 0 && daikin_OutDoor.quantity !== 0){
         for(let x in line){        
             daikin_OutDoor.addImg($("#daikin_outdoor")[0], line[x], null);
+            
             daikin_Us7.addImg($("#daikin-us7")[0], null, line[x]);
             canvas.add(line[x]);
         }
@@ -711,18 +772,17 @@ $("#daikin-option").on('click', '#daikin_outdoor', ()=>{
 let img
 let sizeOfcanvasBg;
 
-function setBgImage(ele) {
-    img = ele;
-    sizeOfcanvasBg = [img.naturalWidth, img.naturalHeight];
-    canvas.setDimensions({
-        width: img.naturalWidth,
-        height: img.naturalHeight
-    });
+function setBgImage(e) {
+    img = e;
     canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
         // Needed to position backgroundImage at 0/0
         originX: 'left',
         originY: 'top'
-    });
+    }).setDimensions({
+        width: img.naturalWidth,
+        height: img.naturalHeight
+    });;
+    canvas.setZoom(1); 
     // $(".canvas-container")[0].style.margin = "auto";
     // $(".canvas-container")[0].style.top = "10%";
     // UpdateModif(true);
@@ -734,137 +794,47 @@ $('#copy').on('click',() =>{
 	// may want copy and paste on different moment.
 	// and you do not want the changes happened
     // later to reflect on the copy.
-    if(daikin_Us7.quantity <= 0){
-        daikin_Us7.updateQuantity();
-    } else if (daikin_OutDoor.quantity <= 0){
-        daikin_OutDoor.updateQuantity();
-    } else if(daikin_Us7.quantity !== 0 || daikin_OutDoor.quantity !== 0) {
-        canvas.getActiveObject().clone(function(cloned) {
-            // _clipboard = cloned;
-            cloned.left += 20;
-            cloned.top += 20;
-            cloned.set({
-                id : canvas.getActiveObject().id,
-                "transparentCorners": false
-            });
-            canvas.add(cloned);
-        });
-    }
-    
-    
-    
-    UpdateModif(true); 
-    
-    // var canvas = target.canvas;
-    // target.clone(function(cloned) {
-    //   cloned.left += 10;
-    //   cloned.top += 10;
-    //   canvas.add(cloned);
-    // });
-    
+    daikin_Us7.copy_and_paste();
 });
 
-// $('#paste').on('click',() =>{
-// 	// clone again, so you can do multiple copies.
-// 	_clipboard.clone(function(clonedObj) {
-// 		canvas.discardActiveObject();
-// 		clonedObj.set({
-// 			left: clonedObj.left + 10,
-// 			top: clonedObj.top + 10,
-// 			evented: true,
-// 		});
-// 		if (clonedObj.type === 'activeSelection') {
-// 			// active selection needs a reference to the canvas.
-// 			clonedObj.canvas = canvas;
-// 			clonedObj.forEachObject(function(obj) {
-// 				canvas.add(obj);
-// 			});
-// 			// this should solve the unselectability
-// 			clonedObj.setCoords();
-// 		} else {
-// 			canvas.add(clonedObj);
-// 		}
-// 		_clipboard.top += 10;
-// 		_clipboard.left += 10;
-// 		canvas.setActiveObject(clonedObj);
-// 		canvas.requestRenderAll();
-// 	});
-// });
+$('#copy').on('click', () =>{
+    daikin_OutDoor.copy_and_paste();
+});
 
 //End Copy and Paste
-let val = 1;
-val = (val * 10 + 0.01 * 10) / 10;
-let scaleRatio;
+
 $("#zoomIn").click(()=>{
-//     if (canvas.backgroundImage === null || canvas.backgroundImage === undefined) {
-//         canvas.clear().renderAll();
-//     } else {
-//         sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] * val), Math.round(sizeOfcanvasBg[1] * val)];
-//         canvas.setDimensions({
-//             width: sizeOfcanvasBg[0],
-//             height: sizeOfcanvasBg[1]
-//         });
-//         canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
-//             scaleX: canvas.width / img.naturalWidth,
-//             scaleY: canvas.height / img.naturalHeight
-//         });
-//         canvas.renderAll();
-//         UpdateModif(true);
-//     }
-//     for (let i in canvas._objects) {
-//         // let oCoordskey = Object.keys(canvas._objects[i].oCoords);
+    canvas.discardActiveObject();
+    $(".deleteBtn").remove();
+    canvas.setZoom(canvas.getZoom() * 1.1);
+    canvas.setHeight(canvas.getHeight() * 1.1);
+    canvas.setWidth(canvas.getWidth() * 1.1);
+    // canvas.setDimensions({ 
+    //     width : canvas.getWidth(),
+    //     height : canvas.getHeight(),
+    //     originX: 'left',
+    //     originY: 'top'
+    // })
+    console.log(canvas.getHeight(), canvas.getWidth())
+    canvas.renderAll();
+    UpdateModif(true);
+});
 
-//         canvas._objects[i].left *= val;
-//         canvas._objects[i].top *= val;
-
-//         canvas._objects[i].translateX *= val;
-//         canvas._objects[i].translateY *= val;
-
-//         canvas.item(i).setCoords();
-//     }
-//     canvas.discardActiveObject().renderAll();
-//     $(".deleteBtn").remove();
-
-
-scaleRatio = 1; // Math.min($("#wrapCanvas").width / canvas.width, $("#wrapCanvas").heigh/canvas.height);
-// canvas.setDimensions({ width: canvas.getWidth() * scaleRatio, height: canvas.getHeight() * scaleRatio });
-canvas.setZoom(scaleRatio);
-console.log(canvas.height * val)
-console.log(canvas.width * val)
-
-}
-)
-
-// $("#zoomOut").click(()=>{
-//     if (canvas.backgroundImage === null || canvas.backgroundImage === undefined) {
-//         canvas.clear().renderAll();
-//     } else {
-//         sizeOfcanvasBg = [Math.round(sizeOfcanvasBg[0] / val), Math.round(sizeOfcanvasBg[1] / val)];
-//         canvas.setDimensions({
-//             width: sizeOfcanvasBg[0],
-//             height: sizeOfcanvasBg[1]
-//         });
-//         canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
-//             scaleX: canvas.width / img.naturalWidth,
-//             scaleY: canvas.height / img.naturalHeight
-//         });
-//         canvas.renderAll();
-//         UpdateModif(true);
-//     }
-//     for (let i in canvas._objects) {
-//         // let oCoordskey = Object.keys(canvas._objects[i].oCoords);
-
-//         canvas._objects[i].left /= val;
-//         canvas._objects[i].top /= val;
-
-//         canvas._objects[i].translateX /= val;
-//         canvas._objects[i].translateY /= val;
-//         canvas.item(i).setCoords();
-//     }
-//     canvas.discardActiveObject().renderAll();
-//     $(".deleteBtn").remove();
-// }
-// )
+$("#zoomOut").click(()=>{
+    canvas.discardActiveObject();
+    $(".deleteBtn").remove();
+    canvas.setZoom(canvas.getZoom() / 1.1);
+    canvas.setHeight(canvas.getHeight() / 1.1);
+    canvas.setWidth(canvas.getWidth() / 1.1);
+    // canvas.setDimensions({
+    //     width : canvas.getWidth(),
+    //     height : canvas.getHeight(),
+    //     originX: 'left',
+    //     originY: 'top'
+    // })
+    canvas.renderAll();
+    UpdateModif(true);
+});
 
 //Rotate Objects Function
 let deg = 0;
@@ -942,16 +912,7 @@ function modifyCanvas() {
     // daikin_Temp.checkQuantity();
     daikin_Us7.checkQuantity();
     daikin_OutDoor.checkQuantity();
-    if (state.length - 1 - mods >= 0) {
-        if (state[state.length - 1 - mods].backgroundImage !== undefined && state[state.length - 1 - mods].backgroundImage.scaleX !== undefined && state[state.length - 1 - mods].backgroundImage.scaleY !== undefined) {
-            let state_wid = state[state.length - 1 - mods].backgroundImage.width * state[state.length - 1 - mods].backgroundImage.scaleX;
-            let state_hei = state[state.length - 1 - mods].backgroundImage.height * state[state.length - 1 - mods].backgroundImage.scaleY;
-            canvas.setDimensions({
-                width: state_wid,
-                height: state_hei
-            });
-        }
-    }
+    
     header_disable();
 }
 
@@ -966,6 +927,7 @@ $('#undoBtn').click(()=>{
         on_undo(true)
         // console.log("mods " + mods);
     }
+    console.log(state);
     undo_redo_enable(state, mods);
     modifyCanvas();
     canvas.renderAll();
@@ -982,6 +944,7 @@ $('#redoBtn').click(()=>{
         // console.log("state " + state.length);
         // console.log("mods " + mods);
     }
+    console.log(state);
     undo_redo_enable(state, mods);
     modifyCanvas();
     canvas.renderAll();
