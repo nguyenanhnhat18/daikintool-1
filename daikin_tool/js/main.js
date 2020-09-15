@@ -130,7 +130,7 @@
                             var itemFloor = '<div class="pane-affix__catalog-column is-2">\
                                                 <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
                                                     <div class="item-texture__image">\
-                                                        <img src="' + res[i] + '" onclick="setBgImage(this)" alt="">\
+                                                        <img src="' + res[i] + '" alt="">\
                                                     </div>\
                                                 </a>\
                                             </div>';
@@ -192,7 +192,7 @@
                     var itemDaikin = '<div class="pane-affix__catalog-column is-2">\
                                         <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
                                             <div class="item-texture__image">\
-                                                <img src="' + e.target.result + '" onclick="setBgImage(this)" alt="">\
+                                                <img src="' + e.target.result + '" alt="">\
                                             </div>\
                                         </a>\
                                     </div>';
@@ -372,7 +372,7 @@ function on_undo(isUndo) {
 let UpdateModif = (history)=>{
     if (history === true) {
         canvas.includeDefaultValues = false;
-        myJson = canvas.toJSON(['setcontrolsVisibility', "id", "transparentCorners", "centeredScaling"]);
+        myJson = canvas.toJSON(['setcontrolsVisibility', "id", "transparentCorners", "centeredScaling", 'height', 'width']);
         state.push(myJson);
         undo_redo_enable(state, mods);
     }
@@ -446,24 +446,19 @@ class Daikin {
                 oImg.line2 = line2;
                 
                 UpdateModif(true);
-                console.log(l, t)
+               
                 return oImg;                
                 
             });
         }           
     }
-
+   
     copy_and_paste() {
     //     if(this.quantity > 0 && canvas.getActiveObject().id === this.id){
-    //         canvas.getActiveObject().clone(function(cloned) {
-    //             // _clipboard = cloned;
-    //             cloned.left += 20;
-    //             cloned.top += 20;
-    //             cloned.set({
-    //                 'id' : canvas.getActiveObject().id,
-    //                 "transparentCorners": false,
-    //                 'is_clone' : true
-    //             });
+        // let object = fabric.util.object.clone(canvas.getActiveObject());
+        // object.set("top", object.top+5);
+        // object.set("left", object.left+5);
+        // canvas.add(object);
     //             let set_line_1;
     //             let set_line_2;
     //             if(canvas.getActiveObject().line1 !== null && canvas.getActiveObject().line1 !== undefined){
@@ -667,7 +662,7 @@ canvas.on('object:modified', (e)=>{
     UpdateModif(true);
     addDeleteBtn(e.target.oCoords.tr.x, e.target.oCoords.tr.y);
 }
-, 'object:added', (e)=>{
+, 'object:added', (e)=>{   
     UpdateModif(true);
 }
 );
@@ -769,11 +764,12 @@ $("#daikin-option").on('click', '#daikin_outdoor', ()=>{
 
 //add floor plan function
 
-let img
+let img;
 let sizeOfcanvasBg;
 
-function setBgImage(e) {
-    img = e;
+$('#floor-plan-option').on('click', '#FloorItems', (e) =>{
+
+    img = e.target
     canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
         // Needed to position backgroundImage at 0/0
         originX: 'left',
@@ -781,12 +777,15 @@ function setBgImage(e) {
     }).setDimensions({
         width: img.naturalWidth,
         height: img.naturalHeight
-    });;
-    canvas.setZoom(1); 
+    }).setZoom(1);
+    
+    
+    // getBgImage(true);
+
     // $(".canvas-container")[0].style.margin = "auto";
     // $(".canvas-container")[0].style.top = "10%";
-    // UpdateModif(true);
-}
+    UpdateModif(true);
+});
 
 // Copy and Paste
 $('#copy').on('click',() =>{
@@ -804,36 +803,43 @@ $('#copy').on('click', () =>{
 //End Copy and Paste
 
 $("#zoomIn").click(()=>{
-    canvas.discardActiveObject();
-    $(".deleteBtn").remove();
-    canvas.setZoom(canvas.getZoom() * 1.1);
-    canvas.setHeight(canvas.getHeight() * 1.1);
-    canvas.setWidth(canvas.getWidth() * 1.1);
-    // canvas.setDimensions({ 
-    //     width : canvas.getWidth(),
-    //     height : canvas.getHeight(),
-    //     originX: 'left',
-    //     originY: 'top'
-    // })
-    console.log(canvas.getHeight(), canvas.getWidth())
-    canvas.renderAll();
-    UpdateModif(true);
+    if(canvas.backgroundImage !== null){
+        canvas.discardActiveObject();
+        $(".deleteBtn").remove();
+        
+        canvas.setZoom(canvas.getZoom() * 1.1);
+        canvas.setHeight(Math.round(canvas.getHeight() * 1.1));
+        canvas.setWidth(Math.round(canvas.getWidth() * 1.1));
+        // canvas.setDimensions({ 
+        //     width : canvas.getWidth(),
+        //     height : canvas.getHeight(),
+        //     originX: 'left',
+        //     originY: 'top'
+        // })
+        // console.log(canvas.getHeight(), canvas.getWidth());
+        canvas.renderAll();
+        UpdateModif(true);
+    }    
 });
 
 $("#zoomOut").click(()=>{
-    canvas.discardActiveObject();
-    $(".deleteBtn").remove();
-    canvas.setZoom(canvas.getZoom() / 1.1);
-    canvas.setHeight(canvas.getHeight() / 1.1);
-    canvas.setWidth(canvas.getWidth() / 1.1);
-    // canvas.setDimensions({
-    //     width : canvas.getWidth(),
-    //     height : canvas.getHeight(),
-    //     originX: 'left',
-    //     originY: 'top'
-    // })
-    canvas.renderAll();
-    UpdateModif(true);
+    if(canvas.backgroundImage !== null){
+        canvas.discardActiveObject();
+        $(".deleteBtn").remove();
+        
+        canvas.setZoom(canvas.getZoom() / 1.1);
+        canvas.setHeight(Math.round(canvas.getHeight() / 1.1));
+        canvas.setWidth(Math.round(canvas.getWidth() / 1.1));
+        // canvas.setDimensions({
+        //     width : canvas.getWidth(),
+        //     height : canvas.getHeight(),
+        //     originX: 'left',
+        //     originY: 'top'
+        // })
+        // console.log(canvas.getHeight(), canvas.getWidth());
+        canvas.renderAll();
+        UpdateModif(true);
+    }
 });
 
 //Rotate Objects Function
@@ -858,6 +864,7 @@ let setAngle = ()=>{
     UpdateModif(true);
     $(".deleteBtn").remove();
 }
+
 $('#rot_lef').click((e)=>{
     if (cur_angle <= -360) {
         cur_angle += 360;
@@ -879,6 +886,7 @@ $('#rot_rig').click((e)=>{
     setAngle();
 }
 )
+
 $('#rot_90_lef').click((e)=>{
     if (cur_angle <= -360) {
         cur_angle += 360;
@@ -917,36 +925,88 @@ function modifyCanvas() {
 }
 
 $('#undoBtn').click(()=>{
-    if (mods < state.length) {
+
+    if(state[state.length - 1 - mods - 1] !== undefined){
+        currState = state[state.length - 1 - mods].height;
+        heig = state[state.length - 1 - mods - 1].height;
+        widt = state[state.length - 1 - mods - 1].width;        
+        canvas.setHeight(heig);
+        canvas.setWidth(widt);
+        value = currState / heig;
+
+        canvas.setZoom(canvas.getZoom() / value);
+    }
+   
+
+    if (mods < state.length && (state.length - 1 - mods - 1) >= 0) {
         canvas.clear().renderAll();
+        
         canvas.loadFromJSON(state[state.length - 1 - mods - 1]);
         canvas.renderAll();
-        // console.log("geladen " + (state.length-1-mods-1));
+        // console.log("geladen " + (state.length - 1 - mods - 1) );
         // console.log("state " + state.length);
+        
+        // console.log(state[state.length - 1 - mods - 1])
         mods += 1;
+        
         on_undo(true)
         // console.log("mods " + mods);
+        
     }
-    console.log(state);
+    if((state.length - 1 - mods - 1) < 0){
+        canvas.loadFromJSON(state[1]);
+    }
     undo_redo_enable(state, mods);
     modifyCanvas();
+    // console.log(heig, widt);
     canvas.renderAll();
 }
+    
+    
 )
 
 $('#redoBtn').click(()=>{
+    
+    // let heig = state[state.length - 1 - mods + 1].height;
+    // let widt = state[state.length - 1 - mods + 1].width;
+    
+    // canvas.setHeight(heig);
+    // canvas.setWidth(widt);
+   
+
+    
     if (mods > 0) {
         canvas.clear().renderAll();
+        if(state[state.length - 1 - mods] !== undefined){
+            let currState = state[state.length - 1 - mods].height;
+            let heig = state[state.length - 1 - mods + 1].height;
+            let widt = state[state.length - 1 - mods + 1].width;    
+            canvas.setHeight(heig);
+            canvas.setWidth(widt);
+            let value = currState / heig;
+    
+            canvas.setZoom(canvas.getZoom() / value);
+            // console.log("geladen " + (state.length - 1 - mods + 1));
+            // console.log(heig, widt);
+        }
+        
         canvas.loadFromJSON(state[state.length - 1 - mods + 1]);
         canvas.renderAll();
         // console.log("geladen " + (state.length-1-mods+1));
+        // console.log(state[state.length - 1 - mods + 1])
         mods -= 1;
         // console.log("state " + state.length);
         // console.log("mods " + mods);
+        
     }
-    console.log(state);
+    if((state.length - 1 - mods + 1) <= 0){
+        canvas.loadFromJSON(state[1])
+    }
+    
+    
     undo_redo_enable(state, mods);
     modifyCanvas();
+    
     canvas.renderAll();
 }
 )
