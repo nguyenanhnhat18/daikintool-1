@@ -372,7 +372,7 @@ function on_undo(isUndo) {
 let UpdateModif = (history)=>{
     if (history === true) {
         canvas.includeDefaultValues = false;
-        myJson = canvas.toJSON(['setcontrolsVisibility', "id", "transparentCorners", "centeredScaling", 'height', 'width']);
+        myJson = canvas.toJSON(['setcontrolsVisibility', "id", "transparentCorners", "centeredScaling", 'height', 'width', 'originX', 'originY']);
         state.push(myJson);
         undo_redo_enable(state, mods);
     }
@@ -768,7 +768,6 @@ let img;
 let sizeOfcanvasBg;
 
 $('#floor-plan-option').on('click', '#FloorItems', (e) =>{
-
     img = e.target
     canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
         // Needed to position backgroundImage at 0/0
@@ -778,13 +777,12 @@ $('#floor-plan-option').on('click', '#FloorItems', (e) =>{
         width: img.naturalWidth,
         height: img.naturalHeight
     }).setZoom(1);
-    
+    UpdateModif(true);
     
     // getBgImage(true);
 
     // $(".canvas-container")[0].style.margin = "auto";
-    // $(".canvas-container")[0].style.top = "10%";
-    UpdateModif(true);
+    // $(".canvas-container")[0].style.top = "10%";    
 });
 
 // Copy and Paste
@@ -961,8 +959,6 @@ $('#undoBtn').click(()=>{
     // console.log(heig, widt);
     canvas.renderAll();
 }
-    
-    
 )
 
 $('#redoBtn').click(()=>{
@@ -973,8 +969,6 @@ $('#redoBtn').click(()=>{
     // canvas.setHeight(heig);
     // canvas.setWidth(widt);
    
-
-    
     if (mods > 0) {
         canvas.clear().renderAll();
         if(state[state.length - 1 - mods] !== undefined){
