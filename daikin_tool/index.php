@@ -1,5 +1,5 @@
 <html lang="en">
-
+<?php header('Access-Control-Allow-Origin: http://new.suitecrm-pure.com/'); ?>
 
 <head>
     <title>Daikin Design Tool By Pure Electric</title>
@@ -18,7 +18,6 @@
 
 <body>
     <div class="wrapper">
-
         <input type="hidden" id="quote_id" value="">
         <input type="hidden" id="pre_install_photos_c" value="">
 
@@ -185,13 +184,22 @@
         <img src="icon/upload.gif" alt="" style="width: 300px">
         <h3>Preparing Daikin Option</h3>
     </div>
+    <div class="loading_send none">
+        <div class="background-loading"></div>
+        <div class="content_loading">
+            <img src="icon/loading.svg" alt="">
+            <!-- <div id="lottie"></div> -->
+            <h3>Downloading PDF</h3>
+        </div>
+    </div>
     <div id='modal_dialog'>
-    <div class='message'></div>
+        <div class='message'></div>
     </div>
     <script src="js/jquery-3-5-1.js"></script>    
     <script src="js/FileSaver.js" type="text/javascript"></script>
     <script src="js/fabric.js" type="text/javascript"></script>
     <script src="lib/jquery-ui-1.12.1/jquery-ui.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.3/lottie.min.js" integrity="sha512-35O/v2b9y+gtxy3HK+G3Ah60g1hGfrxv67nL6CJ/T56easDKE2TAukzxW+/WOLqyGE7cBg0FR2KhiTJYs+FKrw==" crossorigin="anonymous"></script>
     <script src="js/main.js" type="text/javascript"></script>
 </body>
 </html>

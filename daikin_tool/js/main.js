@@ -4,6 +4,15 @@
     // Active Control Left
     $('.loading').show();
     $('#editor, #editorControls').addClass('hidden-opacity');
+    var animation = bodymovin.loadAnimation({
+        container: document.getElementById('lottie'), // Required
+        path: '/js/loading.json', // Required
+        renderer: 'svg/canvas/html', // Required
+        loop: true, // Optional
+        autoplay: true, // Optional
+        name: "Hello World", // Name for future reference. Optional.
+    });
+    animation.play();
 
     $('.pane-nav__item').click(function() {
         var dataType = $(this).attr('data-type');
@@ -70,20 +79,21 @@
     var url = new URL(url_string);
     var quote_id = url.searchParams.get("quote_id");
 
-    if (quote_id != null) {
+    if(quote_id != null) {
         $.ajax({
             url: "APIGetDaikinOption.php",
             data: {
                 'quote_id': quote_id,
             },
             type: 'POST',
-            success: function(data) {
+            success: function(data)
+            {
                 var res = jQuery.parseJSON(data);
                 $('#pre_install_photos_c').val(res['pre_install_photos_c']);
                 $('#quote_id').val(res['quote_id']);
                 var keys = Object.keys(res['products']);
-                for (var i = 0; i < keys.length; i++) {
-                    if ((keys[i].indexOf('FTX') != -1) || (keys[i].indexOf('FVX') != -1)) {
+                for(var i = 0; i < keys.length; i++) {
+                    if((keys[i].indexOf('FTX') != -1) || (keys[i].indexOf('FVX') != -1)) {
                         var wrapperItem = $('#daikinItems');
                         var itemDaikin = '<div class="pane-affix__catalog-column is-2">\
                                             <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
@@ -91,7 +101,7 @@
                                                     <img src="icon/daikin_indoor_cv.png" id="daikin-us7" alt="">\
                                                 </div>\
                                             </a>\
-                                            <span><strong>' + res['products'][keys[i]]['Product'] + '(' + res['products'][keys[i]]['Quantity'] + 'X)</strong></span>\
+                                            <span><strong>'+res['products'][keys[i]]['Product']+'('+res['products'][keys[i]]['Quantity']+'X)</strong></span>\
                                         </div>';
                         var itemDaikinOutdoor = '<div class="pane-affix__catalog-column is-2">\
                                             <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
@@ -99,14 +109,14 @@
                                                     <img src="icon/daikin_outdoor_cv.png" id="daikin_outdoor" alt="">\
                                                 </div>\
                                             </a>\
-                                            <span><strong>' + res['products'][keys[i]]['Product'] + '-Outdoor (' + res['products'][keys[i]]['Quantity'] + 'X)</strong></span>\
+                                            <span><strong>'+res['products'][keys[i]]['Product']+'-Outdoor ('+res['products'][keys[i]]['Quantity']+'X)</strong></span>\
                                         </div>';
                         wrapperItem.append(itemDaikin);
                         wrapperItem.append(itemDaikinOutdoor);
                     }
                 }
                 downloadFloorPlanFromSuite(res['quote_id'], res['pre_install_photos_c']);
-
+                
             },
             error: function(response) {
                 console.log("Fail");
@@ -122,10 +132,11 @@
                     'pre_install_photos_c': pre_install_photos_c
                 },
                 type: 'POST',
-                success: function(data) {
-                    if (data != 'fail') {
+                success: function(data)
+                {
+                    if(data != 'fail') {
                         var res = jQuery.parseJSON(data);
-                        for (var i = 0; i < res.length; i++) {
+                        for(var i = 0; i < res.length; i++) {
                             var wrapperItemFloor = $('#FloorItems');
                             var itemFloor = '<div class="pane-affix__catalog-column is-2">\
                                                 <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
@@ -134,7 +145,7 @@
                                                     </div>\
                                                 </a>\
                                             </div>';
-                            wrapperItemFloor.append(itemFloor);
+                                            wrapperItemFloor.append(itemFloor);
                             $('.loading').hide();
                             $('#editor, #editorControls').removeClass('hidden-opacity');
                         }
@@ -143,18 +154,17 @@
                         $('.loading').hide();
                         $('#editor, #editorControls').removeClass('hidden-opacity');
                     }
-
+                    
+                    
                 },
-                error: function(response) {
-                    console.log("Fail");
-                },
+                error: function(response){console.log("Fail");},
             });
         }
     } else {
         dialog("Please upload Floor Plan", 'Notify');
         $('.loading').hide();
         $('#editor, #editorControls').removeClass('hidden-opacity');
-        for (var i = 0; i < 1; i++) {
+        for(var i = 0; i < 1; i++) {
             var wrapperItem = $('#daikinItems');
             var itemDaikin = '<div class="pane-affix__catalog-column is-2">\
                                 <a class="pane-affix__catalog-item item-texture is-shrink" id="freeRoomBtn">\
@@ -217,24 +227,40 @@
             let name = `Daikin_Design_Quote_${Math.floor(100000 + Math.random() * 900000)}.png`;
 
             let quote_id = $('#quote_id').val();
+            let pre_install_photos_c = $('#pre_install_photos_c').val();
 
             saveAs(blob, name);
             let dataURL = $('#c').get(0).toDataURL();
+            $('#editor, #editorControls').addClass('hidden-opacity');
+            $('.loading_send').show();
             $.ajax({
                 type: "POST",
-
                 url: "APIUploadToFolderAndGeneratePDF.php",
                 data: {
                     base64Img: dataURL,
                     name: name,
-                    quote_id: quote_id
-
-                }
-            }).done(function(o) {
-                console.log('saved');
+                    quote_id: quote_id,
+                    pre_install_photos_c: pre_install_photos_c
+                },
+                success: function(result)
+                {
+                    downloadPDF(result, name);
+                    console.log('done'+result );
+                    $('#editor, #editorControls').removeClass('hidden-opacity');
+                    $('.loading_send').hide();
+                },
             });
         }
         )
+    }
+
+    function downloadPDF(pdf, name) {
+        const linkSource = `data:application/pdf;base64,${pdf}`;
+        const downloadLink = document.createElement("a");
+        const fileName = 'Pure-Electric-Design-Daikin.pdf';
+        downloadLink.href = linkSource;
+        downloadLink.download = fileName;
+        downloadLink.click();
     }
 
     $("#save").click(()=>{
@@ -287,6 +313,13 @@ const mouseUpHandler = function() {
 // Attach the handler
 $('#wrapCanvas').on('mousedown', mouseDownHandler);
 
+$(document).ready(function(){
+    $(document).keydown(function(e){
+      if(e.which === 16){
+        $('#wrapCanvas').off('mousedown', mouseDownHandler);
+      }     
+    });
+  }); 
 // End drag ro scroll
 
 fabric.Object.prototype.setControlsVisibility({
@@ -346,6 +379,7 @@ function dialog(message, diagTle='Notify', yes=()=>{}, no=()=>{}) {
     });
 }
 
+
 $("#wrapCanvas").height = window.height;
 $("#wrapCanvas").width = window.width;
 
@@ -355,8 +389,9 @@ $("#wrapCanvas").width = window.width;
 // );
 canvas.setBackgroundColor('white', canvas.renderAll.bind(canvas));
 
+
 canvas.counter = 0;
-canvas.selection = false;
+canvas.selection = true;
 let state = [];
 let mods = 0;
 
@@ -372,7 +407,7 @@ function on_undo(isUndo) {
 let UpdateModif = (history)=>{
     if (history === true) {
         canvas.includeDefaultValues = false;
-        myJson = canvas.toJSON(['setcontrolsVisibility', "id", "transparentCorners", "centeredScaling", 'height', 'width', 'originX', 'originY']);
+        myJson = canvas.toJSON(['setcontrolsVisibility', "id", "transparentCorners", "centeredScaling", 'height', 'width']);
         state.push(myJson);
         undo_redo_enable(state, mods);
     }
@@ -584,17 +619,19 @@ function header_enable(){
 
 function makeLine(coords) {
     return new fabric.Line(coords, {
+        top: coords !== undefined ? coords[0] : 0, 
+        left: coords !== undefined ? coords[1] : 0,
         fill: 'blue',
         stroke: 'blue',
         strokeWidth: 5,
-        selectable: false,
+        selectable: true,
         evented: false,
         dirty: false
     });
 }
 
-let daikin_Us7 = new Daikin(0, 3,"daikin-us7");
-let daikin_OutDoor = new Daikin(0, 3,"daikin_outdoor");
+let daikin_Us7 = new Daikin(0, 4,"daikin-us7");
+let daikin_OutDoor = new Daikin(0, 4,"daikin_outdoor");
 
 // add delete button
 let arrayItems = canvas._objects;
@@ -641,7 +678,7 @@ canvas.on('object:selected', (e)=>{
 );
 
 canvas.on('mouse:down', (e)=>{
-    UpdateModif(false)
+    UpdateModif(false);
     if (canvas.getActiveObject()) {
         $('#wrapCanvas').off('mousedown', mouseDownHandler);
         cur_angle = e.target.angle;
@@ -654,6 +691,16 @@ canvas.on('mouse:down', (e)=>{
     }
 }
 );
+
+var multiSelection = [];
+canvas.on('selection:created', selected => {
+  if(this.multiSelect) {
+    multiSelection.push(selected);
+    var groupSelection = new fabric.ActiveSelection(multiSelection)
+    canvas.setActiveObject(groupSelection);
+  }
+});
+
 canvas.on('mouse:up', (e)=>{
     UpdateModif(false);
 }
@@ -768,21 +815,24 @@ let img;
 let sizeOfcanvasBg;
 
 $('#floor-plan-option').on('click', '#FloorItems', (e) =>{
+
     img = e.target
     canvas.setBackgroundImage(img.src, canvas.renderAll.bind(canvas), {
         // Needed to position backgroundImage at 0/0
         originX: 'left',
+
         originY: 'top'
     }).setDimensions({
         width: img.naturalWidth,
         height: img.naturalHeight
     }).setZoom(1);
-    UpdateModif(true);
+    
     
     // getBgImage(true);
 
     // $(".canvas-container")[0].style.margin = "auto";
-    // $(".canvas-container")[0].style.top = "10%";    
+    // $(".canvas-container")[0].style.top = "10%";
+    UpdateModif(true);
 });
 
 // Copy and Paste
@@ -959,6 +1009,8 @@ $('#undoBtn').click(()=>{
     // console.log(heig, widt);
     canvas.renderAll();
 }
+    
+    
 )
 
 $('#redoBtn').click(()=>{
@@ -969,6 +1021,8 @@ $('#redoBtn').click(()=>{
     // canvas.setHeight(heig);
     // canvas.setWidth(widt);
    
+
+    
     if (mods > 0) {
         canvas.clear().renderAll();
         if(state[state.length - 1 - mods] !== undefined){
